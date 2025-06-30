@@ -34,11 +34,28 @@ const LoginPage: React.FC = () => {
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
   };
+  const onSubmit = async (data: LoginFormInputs) => {
+    try{
 
-  const onSubmit = (data: LoginFormInputs) => {
-    console.log('Login Data:', data);
+
+      const response =await fetch ('/api/auth',{
+     method:'GET',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+     })
+   const result = await response.json();
+
+    if (!response.ok) {
+      alert(result.error || 'Signup failed');
+    } else {
+      alert('Signup successful!');
+     
+    }
+  } catch (error) {
+    console.error('Signup error:', error);
+    alert('Something went wrong.');
+  }
   };
-
   return (
     <Box
       sx={{

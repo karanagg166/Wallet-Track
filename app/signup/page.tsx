@@ -35,10 +35,28 @@ const SignupPage: React.FC = () => {
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
   };
+const onSubmit = async (data: SignupFormInputs) => {
+  try {
+    const response = await fetch('/api/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
 
-  const onSubmit = (data: SignupFormInputs) => {
-    console.log('Login Data:', data);
-  };
+    const result = await response.json();
+
+    if (!response.ok) {
+      alert(result.error || 'Signup failed');
+    } else {
+      alert('Signup successful!');
+     
+    }
+  } catch (error) {
+    console.error('Signup error:', error);
+    alert('Something went wrong.');
+  }
+};
+
 
   return (
     <Box
@@ -58,9 +76,9 @@ const SignupPage: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
         whileHover={{
-          scale: 1.08,
+          scale: 1.05,
           boxShadow: '0 25px 50px rgba(0, 0, 0, 0.2)',
-          transition: { duration: 0.2 },
+          transition: { duration: 0.01 },
         }}
         style={{
           width: '100%',
