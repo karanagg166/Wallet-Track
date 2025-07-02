@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import { LockOpen, Email, Visibility, VisibilityOff } from '@mui/icons-material';
 import { motion } from 'framer-motion';
-
+import { useRouter } from "next/navigation";
 const schema = z.object({
   email: z.string().email('Invalid email'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
@@ -29,6 +29,7 @@ const LoginPage: React.FC = () => {
   } = useForm<LoginFormInputs>({
     resolver: zodResolver(schema),
   });
+   const router = useRouter();
 
   const [showPassword, setShowPassword] = React.useState(false);
   const togglePasswordVisibility = () => {
@@ -39,20 +40,21 @@ const LoginPage: React.FC = () => {
 
 
       const response =await fetch ('/api/auth',{
-     method:'GET',
+     method:'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
+       credentials: "include",
      })
    const result = await response.json();
-
+   console.log(result);
     if (!response.ok) {
-      alert(result.error || 'Signup failed');
+      alert(result.error || 'Login failed');
     } else {
-      alert('Signup successful!');
-     
-    }
+      alert('Login successful!');
+      router.push("/dashboard");
+   }
   } catch (error) {
-    console.error('Signup error:', error);
+    console.error('Login error:', error);
     alert('Something went wrong.');
   }
   };

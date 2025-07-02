@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import { LockOpen, Email, Visibility, VisibilityOff,Person  } from '@mui/icons-material';
 import { motion } from 'framer-motion';
-
+import { useRouter } from "next/navigation";
 const schema = z.object({
   name: z.string().min(1,'Name is required'),
   email: z.string().email('Invalid email'),
@@ -30,7 +30,7 @@ const SignupPage: React.FC = () => {
   } = useForm<SignupFormInputs>({
     resolver: zodResolver(schema),
   });
-
+const router=useRouter();
   const [showPassword, setShowPassword] = React.useState(false);
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
@@ -49,7 +49,7 @@ const onSubmit = async (data: SignupFormInputs) => {
       alert(result.error || 'Signup failed');
     } else {
       alert('Signup successful!');
-     
+        router.push("/dashboard");
     }
   } catch (error) {
     console.error('Signup error:', error);

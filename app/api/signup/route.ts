@@ -1,7 +1,9 @@
 import { PrismaClient } from '@prisma/client';
 import { hash } from 'bcrypt';
-
+import { NextResponse } from "next/server";
+import jwt from 'jsonwebtoken';
 const prisma = new PrismaClient();
+const JWT_SECRET = process.env.JWT_SECRET
 
 export async function POST(req: Request) {
    
@@ -37,6 +39,45 @@ export async function POST(req: Request) {
         password: hashedPassword,
       },
     });
+
+
+ const token = jwt.sign(
+      { id: newUser.id, email: newUser.email },
+      JWT_SECRET,
+      { expiresIn: '3h' } // token is valid for 7 days
+    );
+        const res = NextResponse.json({ message: "Login successful" });
+        res.cookies.set("authToken", token, {
+        httpOnly: false,
+       secure: true, // true for production/https
+       sameSite: "lax",
+       path: "/",
+       maxAge: 60 * 60, // 1 hour
+  });
+ const user = {
+  email: newUser.email,
+  name: newUser.name,
+};
+   res.cookies.set("name",user.name, {
+        httpOnly: false,
+       secure: true, // true for production/https
+       sameSite: "lax",
+       path: "/",
+       maxAge: 60 * 60, // 1 hour
+  });
+  res.cookies.set("email",user.email, {
+        httpOnly: false,
+       secure: true, // true for production/https
+       sameSite: "lax",
+       path: "/",
+       maxAge: 60 * 60, // 1 hour
+  });
+
+
+
+
+
+
 
     return new Response(
       JSON.stringify({ message: 'User created successfully', userId: newUser.id }),

@@ -10,6 +10,15 @@
 .flex {
   display: flex;
 }
+.min-h-screen {
+  min-height: 100vh;
+}
+.flex-grow {
+  flex-grow: 1;
+}
+.flex-col {
+  flex-direction: column;
+}
 .border {
   border-style: var(--tw-border-style);
   border-width: 1px;
