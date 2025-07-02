@@ -18,6 +18,7 @@ const schema = z.object({
   email: z.string().email('Invalid email'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
 });
+import Cookies from 'js-cookie';
 
 type LoginFormInputs = z.infer<typeof schema>;
 
@@ -46,12 +47,16 @@ const LoginPage: React.FC = () => {
        credentials: "include",
      })
    const result = await response.json();
-   console.log(result);
+ 
+   const token=result.token;
+   
     if (!response.ok) {
       alert(result.error || 'Login failed');
     } else {
+
       alert('Login successful!');
       router.push("/dashboard");
+    
    }
   } catch (error) {
     console.error('Login error:', error);

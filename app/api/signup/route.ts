@@ -46,33 +46,8 @@ export async function POST(req: Request) {
       JWT_SECRET,
       { expiresIn: '3h' } // token is valid for 7 days
     );
-        const res = NextResponse.json({ message: "Login successful" });
-        res.cookies.set("authToken", token, {
-        httpOnly: false,
-       secure: true, // true for production/https
-       sameSite: "lax",
-       path: "/",
-       maxAge: 60 * 60, // 1 hour
-  });
- const user = {
-  email: newUser.email,
-  name: newUser.name,
-};
-   res.cookies.set("name",user.name, {
-        httpOnly: false,
-       secure: true, // true for production/https
-       sameSite: "lax",
-       path: "/",
-       maxAge: 60 * 60, // 1 hour
-  });
-  res.cookies.set("email",user.email, {
-        httpOnly: false,
-       secure: true, // true for production/https
-       sameSite: "lax",
-       path: "/",
-       maxAge: 60 * 60, // 1 hour
-  });
-
+       
+      
 
 
 
@@ -80,7 +55,7 @@ export async function POST(req: Request) {
 
 
     return new Response(
-      JSON.stringify({ message: 'User created successfully', userId: newUser.id }),
+      JSON.stringify({ message: 'User created successfully', userId: newUser.id,token }),
       { status: 201 }
     );
   } catch (err) {

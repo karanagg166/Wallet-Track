@@ -3,7 +3,7 @@ import { compare } from 'bcrypt';
 import jwt from 'jsonwebtoken';
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET
-
+import { cookies } from 'next/headers';
 import { NextResponse } from "next/server";
 
 
@@ -25,58 +25,56 @@ export async function POST(req: Request) {
         status: 409,
       });
     }
+
+
   const isPasswordCorrect = await compare(password, existingUser.password);
     if (!isPasswordCorrect) {
       return new Response(JSON.stringify({ error: 'Wrong password' }), {
         status: 401,
       });
     }
+    
+    
+    const response = NextResponse.json({ message: 'Login successful' });
+
+
+
     const token = jwt.sign(
-      { id: existingUser.id, email: existingUser.email },
-      JWT_SECRET,
-      { expiresIn: '3h' } // token is valid for 7 days
-    );
-        const res = NextResponse.json({ message: "Login successful" });
-        res.cookies.set("authToken", token, {
-        httpOnly: true,
-       secure: true, // true for production/https
-       sameSite: "lax",
-       path: "/",
-       maxAge: 60 * 60, // 1 hour
-  });
-//console.log("Cookie is being set:", res.cookies.get("authToken"));
- const user = {
-  email: existingUser.email,
-  name: existingUser.name,
-};
-   res.cookies.set("name",user.name, {
-        httpOnly: false,
-       secure: true, // true for production/https
-       sameSite: "lax",
-       path: "/",
-       maxAge: 60 * 60, // 1 hour
-  });
-  res.cookies.set("email",user.email, {
-        httpOnly: false,
-       secure: true, // true for production/https
-       sameSite: "lax",
-       path: "/",
-       maxAge: 60 * 60, // 1 hour
-  });
+  { id: existingUser.id, email: existingUser.email },
+  JWT_SECRET,
+  { expiresIn: '3h' }
+);
 
 
-    return new Response(
-      JSON.stringify({
-        message: 'Login successful',
-        token,
-        user: {
-          id: existingUser.id,
-          name: existingUser.name,
-          email: existingUser.email,
-        },
-      }),
-      { status: 200 }
-    );
+console.log("backend token",token);
+
+
+
+
+
+response.cookies.set('authToken', token, {
+  httpOnly: true,
+  path: '/',
+  maxAge: 60 * 60 * 3, // 3 hours
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax',
+});
+
+return response;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
  } 
   catch (err) {
     console.error('Login error:', err);
