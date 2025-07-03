@@ -2,11 +2,15 @@
 module.exports = {
   content: [
     "./app/**/*.{js,ts,jsx,tsx}",
-    "./pages/**/*.{js,ts,jsx,tsx}",
+    "./pages/**/*.{js,ts,jsx,tsx}",      // If using pages dir
     "./components/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        "spotify-green": "#1DB954", // Optional custom color
+      },
+    },
   },
   plugins: [],
 };

@@ -1,8 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Libertinus+Math&display=swap');
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 @font-face {
   font-family: 'Libertinus Math';
   src: url('/fonts/LibertinusMath-Regular.woff2') format('woff2');

@@ -1,18 +1,26 @@
-// app/dashboard/layout.tsx (or wherever it's located)
-import Navbar from "@/components/Navbar";
+// app/dashboard/layout.tsx
+import Sidebar from "@/components/Sidebar";
 import Footer from "@/components/Footer";
+import Navbar from '@/components/Navbar';
 
-export default function DoctorLayout({ children }: { children: React.ReactNode }) {
+
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
-   
-      <Navbar />
+    <div className="flex min-h-screen bg-white text-black">
+      {/* Left Sidebar */}
+        <Sidebar />
+    //  <Navbar/>
+    
 
-      <main className="flex-grow p-4 pt-24">
-        {children}
-      </main>
 
-      <Footer />
+      {/* Main Content Area */}
+           <div className="flex flex-col flex-grow bg-white ml-56">
+
+        <main className="flex-grow p-6">
+          {children}
+        </main>
+        <Footer />
+      </div>
     </div>
   );
 }

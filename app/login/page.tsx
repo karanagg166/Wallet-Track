@@ -18,6 +18,7 @@ const schema = z.object({
   email: z.string().email('Invalid email'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
 });
+
 import Cookies from 'js-cookie';
 
 type LoginFormInputs = z.infer<typeof schema>;
@@ -95,7 +96,7 @@ const LoginPage: React.FC = () => {
           fontFamily: "'Libertinus Math', serif",
         }}
       >
-        <div style={{ textAlign: 'center', marginBottom: '1.5rem', }}>
+        <div style={{ textAlign: 'center', marginBottom: '1.5rem' } as React.CSSProperties}>
           <LockOpen fontSize="large" color="primary" />
           <Typography variant="h4" fontWeight="bold" color="textPrimary">
             Elcome Back
@@ -107,7 +108,7 @@ const LoginPage: React.FC = () => {
 
         <form
           onSubmit={handleSubmit(onSubmit)}
-          style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}
+          style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' } as React.CSSProperties}
         >
           <TextField
             label="Email"

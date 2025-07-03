@@ -1,6 +1,6 @@
 // app/private/layout.tsx
 import { redirect } from 'next/navigation';
-
+import Navbar from "@/components/Navbar"
 export default function PrivateLayout({ children }: { children: React.ReactNode }) {
   const isAuthenticated = true; // Replace with actual logic (cookies/token check)
 
@@ -10,7 +10,7 @@ export default function PrivateLayout({ children }: { children: React.ReactNode 
 
   return (
     <div>
-      {/* Optional: Private sidebar/navbar */}
+     <Navbar/>
       {children}
     </div>
   );
