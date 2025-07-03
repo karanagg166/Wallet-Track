@@ -48,7 +48,7 @@ const LoginPage: React.FC = () => {
      })
    const result = await response.json();
  
-   const token=result.token;
+
    
     if (!response.ok) {
       alert(result.error || 'Login failed');

@@ -49,15 +49,20 @@ export async function POST(req: Request) {
        
       
 
+ const response = NextResponse.json({ message: 'Login successful' });
 
 
 
 
+response.cookies.set('authToken', token, {
+  httpOnly: true,
+  path: '/',
+  maxAge: 60 * 60 * 3, // 3 hours
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax',
+});
 
-    return new Response(
-      JSON.stringify({ message: 'User created successfully', userId: newUser.id,token }),
-      { status: 201 }
-    );
+return response;
   } catch (err) {
     console.error('Signup error:', err);
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
