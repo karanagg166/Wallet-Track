@@ -56,7 +56,7 @@ const NavItems: NavItem[] = [
   {
     id: "News",
     label: "News",
-    href: "/News",
+    href: "/dashboard/news",
     icon: <ArticleIcon sx={{ color: "#fecdd3" }} />, // light rose
   },
   {
