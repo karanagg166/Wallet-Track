@@ -99,7 +99,7 @@ return (
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}
     >
-      StockSense 🚀
+      Wallet Track
     </motion.h1>
 
     {/* Nav Items */}
