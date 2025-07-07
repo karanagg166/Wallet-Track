@@ -2,7 +2,9 @@ import { PrismaClient } from '@prisma/client';
 import { hash } from 'bcrypt';
 import { NextResponse } from "next/server";
 import jwt from 'jsonwebtoken';
+import { setUserCookies } from '@/lib/cookies/setUserCookies'; 
 const prisma = new PrismaClient();
+
 const JWT_SECRET = process.env.JWT_SECRET
 
 export async function POST(req: Request) {
@@ -11,13 +13,7 @@ export async function POST(req: Request) {
   try {
     const { name, email, password } = await req.json();
 
-    if (!name || !email || !password) {
-      return new Response(JSON.stringify({ error: 'Missing fields' }), {
-        status: 400,
-      });
-    }
-
-    // Check if user already exists
+    
     const existingUser = await prisma.user.findUnique({
       where: { email },
     });
@@ -27,8 +23,7 @@ export async function POST(req: Request) {
         status: 409,
       });
     }
-
-    // Hash password
+ 
     const hashedPassword = await hash(password, 10);
 
     // Create new user
@@ -54,15 +49,12 @@ export async function POST(req: Request) {
 
 
 
-response.cookies.set('authToken', token, {
-  httpOnly: true,
-  path: '/',
-  maxAge: 60 * 60 * 3, // 3 hours
-  secure: process.env.NODE_ENV === 'production',
-  sameSite: 'lax',
+return setUserCookies(response,{
+id:newUser.id,
+name:newUser.name,
+email:newUser.email,
+token,
 });
-
-return response;
   } catch (err) {
     console.error('Signup error:', err);
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
