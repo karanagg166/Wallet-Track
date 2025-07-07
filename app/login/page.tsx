@@ -47,13 +47,16 @@ const LoginPage: React.FC = () => {
         credentials: "include",
       });
       const result = await response.json();
-
+    
+  
+     
       if (!response.ok) {
         alert(result.error || "Login failed");
       } else {
         alert("Login successful!");
         router.push("/dashboard");
       }
+ 
     } catch (error) {
       console.error("Login error:", error);
       alert("Something went wrong.");
