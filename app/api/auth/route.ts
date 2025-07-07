@@ -60,6 +60,36 @@ response.cookies.set('authToken', token, {
   sameSite: 'lax',
 });
 
+
+response.cookies.set('Id', existingUser.id, {
+ httpOnly: false,
+  path: '/',
+  maxAge: 60 * 60 * 3, // 3 hours
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax',
+});
+
+
+response.cookies.set('email', existingUser.email, {
+  httpOnly: false,
+  path: '/',
+  maxAge: 60 * 60 * 3, // 3 hours
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax',
+});
+
+
+
+response.cookies.set('name', existingUser.name, {
+  httpOnly: false,
+  path: '/',
+  maxAge: 60 * 60 * 3, // 3 hours
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax',
+});
+
+
+
 return response;
 
 
