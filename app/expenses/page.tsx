@@ -1,12 +1,13 @@
 "use client";
 
-import React,{useState,useEffect} from "react";
+import React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
+
 const schema = z.object({
   amount: z.number().min(1, "Amount must be at least 1"),
   category: z.string().nonempty("Category is required"),
@@ -28,25 +29,21 @@ const ExpenseForm: React.FC = () => {
   } = useForm<ExpenseFormInputs>({
     resolver: zodResolver(schema),
   });
-const [userId,setUserId]=React.useState(null);
+
+
   const router= useRouter();
+ 
 
 
-  useEffect(()=>{
- const id = localStorage.getItem("Id");
-    setUserId(id);
 
-  },[]);
+
+
+
 
   const onSubmit = async (data: ExpenseFormInputs) => {
   
     
-    console.log(userId);
-    if (!userId) {
-    alert("User not logged in.");
-    return;
-    }
-    alert("hi");
+
 
     try {
       const response = await fetch("/api/expense", {

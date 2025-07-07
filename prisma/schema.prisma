@@ -14,4 +14,16 @@ model User {
   password String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  expenses  Expense[]
+}
+model Expense {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  amount        Int
+  title         String
+  createdAt     DateTime @default(now())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  paymentmethod String
+  category      String
+  expenseAt     DateTime // combines date + time
 }
