@@ -4,7 +4,7 @@ import { jwtVerify } from "jose";
 const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET!);
 
 export async function getTokenFromCookie(): Promise<string | null> {
-  const cookieStore = await cookies(); // ✅ await here
+  const cookieStore = await cookies(); 
   const token = cookieStore.get("authToken")?.value;
   return token ?? null;
 }
