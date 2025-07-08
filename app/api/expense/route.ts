@@ -1,6 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { NextResponse } from 'next/server';
-import { getUserFromCookie } from '@/app/utils/cookies/CookieUtils';
+import { getUserFromCookie } from '@/lib/cookies/CookieUtils';
 
 const prisma = new PrismaClient();
 
