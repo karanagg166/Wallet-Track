@@ -4,7 +4,8 @@ import { compare } from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { NextResponse } from 'next/server';
 import { setUserCookies } from '@/lib/cookies/setUserCookies';
-
+import { getTokenFromCookie } from '@/lib/cookies/CookieUtils';
+import { deleteUserCookies } from '@/lib/cookies/deleteUserCookies';
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET!;
 
@@ -47,4 +48,23 @@ export async function POST(req: Request) {
     console.error('Login error:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
+}
+export async function DELETE(req:Request){
+
+try {
+const token=getTokenFromCookie();
+if(!token){
+    return NextResponse.json({ error: 'User not logged in' }, { status: 404 });
+}
+const response = NextResponse.json({ message: 'Logout Sucessfully' });
+return deleteUserCookies(response);
+
+
+}
+catch(err){
+ console.error('Login error:', err);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+
+}
+
 }
