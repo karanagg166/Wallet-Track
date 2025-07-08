@@ -29,11 +29,19 @@ export default function Home() {
               View Transactions
             </div>
             <div
-              onClick={() => router.push("/expenses")}
+              onClick={() => router.push("/dashboard/expenses")}
               className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 cursor-pointer transition"
             >
               Add Expense
             </div>
+  <div
+              onClick={() => router.push("/dashboard/incomes")}
+              className="bg-blue-800 text-white px-6 py-3 rounded-lg hover:bg-green-700 cursor-pointer transition"
+            >
+              Add Income
+            </div>
+
+
           </div>
         </div>
 
