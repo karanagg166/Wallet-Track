@@ -8,8 +8,7 @@ export async function POST(req: Request) {
   try {
     const user = await getUserFromCookie();
 
-    console.log(user);
-
+    
     if (!user || !user.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -36,3 +35,34 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
+export async function DELETE(req: Request) {
+  try {
+    const user = await getUserFromCookie();
+     if (!user || !user.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const { expenseId } = await req.json();
+    
+    if (!expenseId) {
+      return NextResponse.json({ error: "Expense ID is required" }, { status: 400 });
+    }
+
+    const exp = await prisma.expense.findUnique({ where: { id: expenseId } });
+console.log("hi",exp);
+    if (!exp) {
+      return NextResponse.json({ error: "Expense does not exist" }, { status: 404 });
+    }
+
+    if (exp.userId !== user.id) {
+      return NextResponse.json({ error: "Forbidden: You cannot delete this expense" }, { status: 403 });
+    }
+
+    const deleted = await prisma.expense.delete({ where: { id: expenseId } });  
+
+    return NextResponse.json({ message: "Expense deleted", deleted }, { status: 200 });
+  } catch (err) {
+    console.error('Error deleting expense:', err);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}
+

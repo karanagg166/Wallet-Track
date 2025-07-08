@@ -8,22 +8,34 @@ datasource db {
 }
 
 model User {
-  id       String   @id @default(auto()) @map("_id") @db.ObjectId
-  name     String
-  email    String   @unique
-  password String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  expenses  Expense[]
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  email     String    @unique
+  password  String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  expenses  Expense[] // ✅ No typo here
+  incomes   Income[]  // ✅ Fixed typo: changed `incomes.` → `incomes`
 }
+
 model Expense {
   id            String    @id @default(auto()) @map("_id") @db.ObjectId
   amount        Int
   title         String
-  createdAt     DateTime @default(now())
-  userId        String
-  user          User     @relation(fields: [userId], references: [id])
+  createdAt     DateTime  @default(now())
+  userId        String    @db.ObjectId       // ✅ Correct for Mongo relation
+  user          User      @relation(fields: [userId], references: [id])
   paymentmethod String
   category      String
-  expenseAt     DateTime // combines date + time
+  expenseAt     DateTime  // date + time combined
+}
+
+model Income {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  amount        Int                        // ✅ Fixed typo: `amount.` → `amount`
+  title         String
+  createdAt     DateTime  @default(now())
+  userId        String    @db.ObjectId      // ✅ Match MongoDB
+  user          User      @relation(fields: [userId], references: [id])
+  incomesource  String
 }
