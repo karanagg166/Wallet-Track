@@ -38,4 +38,5 @@ model Income {
   userId        String    @db.ObjectId      // ✅ Match MongoDB
   user          User      @relation(fields: [userId], references: [id])
   incomesource  String
+  incomeAt     DateTime
 }
