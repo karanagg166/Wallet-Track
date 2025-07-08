@@ -1,12 +1,14 @@
 import { PrismaClient } from '@prisma/client';
 import { NextResponse } from 'next/server';
-import { getUserFromCookie } from '@/app/utils/cookies/cookieUtils';
+import { getUserFromCookie } from '@/app/utils/cookies/CookieUtils';
 
 const prisma = new PrismaClient();
 
 export async function POST(req: Request) {
   try {
     const user = await getUserFromCookie();
+
+    console.log(user);
 
     if (!user || !user.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

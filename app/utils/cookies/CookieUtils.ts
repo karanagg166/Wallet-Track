@@ -1,10 +1,10 @@
 import { cookies } from "next/headers";
 import { jwtVerify } from "jose";
 
-const JWT_SECRET = process.env.JWT_SECRET!;
+const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET!);
 
 export async function getTokenFromCookie(): Promise<string | null> {
-  const cookieStore = await cookies();
+  const cookieStore = await cookies(); // ✅ await here
   const token = cookieStore.get("authToken")?.value;
   return token ?? null;
 }
@@ -15,15 +15,11 @@ export async function getUserFromCookie(): Promise<null | {
   iat?: number;
   exp?: number;
 }> {
-  const token = getTokenFromCookie(); 
-  if (!token) return null;
- if (!token || typeof token !== "string") return null;
-  try {
-    const { payload } = await jwtVerify(
-      token,
-      new TextEncoder().encode(JWT_SECRET)
-    );
+  const token = await getTokenFromCookie();
+  if (!token || typeof token !== "string") return null;
 
+  try {
+    const { payload } = await jwtVerify(token, JWT_SECRET);
     return payload as {
       id: string;
       email: string;
