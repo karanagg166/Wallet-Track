@@ -17,63 +17,112 @@ export default function TransactionPage() {
   const [transactions, setTransactions] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch expenses on mount
   useEffect(() => {
     const fetchExpenses = async () => {
-        try {
+      try {
         const res = await fetch("/api/getTransactions");
         if (!res.ok) throw new Error("Failed to fetch expenses");
         const json = await res.json();
-        const expenses = json.data; // <-- access the array directly
+        const expenses = json.data;
 
-        // Sort by expenseAt descending
+        // Sort by date descending
         const sorted = expenses.sort(
-            (a: Expense, b: Expense) => new Date(b.expenseAt).getTime() - new Date(a.expenseAt).getTime()
+          (a: Expense, b: Expense) =>
+            new Date(b.expenseAt).getTime() -
+            new Date(a.expenseAt).getTime()
         );
 
         setTransactions(sorted);
-        } catch (error) {
+      } catch (error) {
         console.error(error);
-        } finally {
+      } finally {
         setLoading(false);
-        }
+      }
     };
 
     fetchExpenses();
-    }, []);
+  }, []);
 
+  const deleteTransaction = async (id: string) => {
+    const confirmed = confirm("Are you sure you want to delete this transaction?");
+    if (!confirmed) return;
+
+    try {
+      const res = await fetch(`/api/expense`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ expenseId: id }),
+      });
+
+      if (!res.ok) throw new Error("Failed to delete transaction");
+
+      // Remove from UI
+      setTransactions((prev) => prev.filter((txn) => txn.id !== id));
+    } catch (error) {
+      console.error(error);
+      alert("Could not delete transaction.");
+    }
+  };
 
   if (loading) {
     return <div className="p-4 text-gray-500">Loading transactions...</div>;
   }
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Your Transactions</h1>
+    <div className="p-6 max-w-3xl mx-auto">
+      <h1 className="text-3xl font-bold mb-4 text-center text-gray-800">
+        Your Transactions
+      </h1>
+
+      {/* Toolbar with Add buttons */}
+      <div className="flex justify-center gap-4 mb-6">
+        <button
+          onClick={() => router.push("/dashboard/expenses")}
+          className="bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700 transition"
+        >
+          Add Expense
+        </button>
+        <button
+          onClick={() => router.push("/dashboard/incomes")}
+          className="bg-blue-800 text-white px-5 py-2 rounded-lg hover:bg-blue-900 transition"
+        >
+          Add Income
+        </button>
+      </div>
 
       {transactions.length === 0 ? (
-        <p className="text-gray-500">No transactions found.</p>
+        <p className="text-center text-gray-500">No transactions found.</p>
       ) : (
-        <ul className="space-y-4">
+        <ul className="space-y-3">
           {transactions.map((txn) => (
             <li
               key={txn.id}
-              className="border rounded-lg p-4 shadow-sm hover:shadow transition"
+              className="border border-gray-200 rounded-xl p-4 shadow hover:shadow-md transition flex justify-between items-center bg-white"
             >
-              <div className="flex justify-between items-center">
-                <div>
-                  <h2 className="text-lg font-semibold">{txn.title}</h2>
-                  <p className="text-sm text-gray-500">{txn.category}</p>
-                  <p className="text-sm text-gray-400">
-                    {new Date(txn.expenseAt).toLocaleString()}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="text-lg font-bold">
-                    ₹{txn.amount.toFixed(2)}
-                  </p>
-                  <p className="text-sm text-gray-500">{txn.paymentmethod}</p>
-                </div>
+              {/* Left side */}
+              <div>
+                <h2 className="text-lg font-semibold text-gray-800">
+                  {txn.title}
+                </h2>
+                <p className="text-sm text-gray-500">{txn.category}</p>
+                <p className="text-xs text-gray-400">
+                  {new Date(txn.expenseAt).toLocaleString()}
+                </p>
+              </div>
+
+              {/* Right side: amount + delete button */}
+              <div className="flex items-center gap-4">
+                <p className="text-lg font-bold text-green-600">
+                  ₹{txn.amount.toFixed(2)}
+                </p>
+                <button
+                  onClick={() => deleteTransaction(txn.id)}
+                  className="px-3 py-1.5 text-sm rounded-lg bg-black text-white hover:bg-gray-800 transition"
+                >
+                  Delete
+                </button>
               </div>
             </li>
           ))}

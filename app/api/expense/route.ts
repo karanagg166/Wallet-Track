@@ -35,13 +35,17 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
+
 export async function DELETE(req: Request) {
   try {
+    
     const user = await getUserFromCookie();
      if (!user || !user.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
     const { expenseId } = await req.json();
+
+    console.log(expenseId);
     
     if (!expenseId) {
       return NextResponse.json({ error: "Expense ID is required" }, { status: 400 });
@@ -65,4 +69,3 @@ console.log("hi",exp);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
-

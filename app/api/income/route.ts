@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     const { amount, title, date,incomesource } = await req.json();
 
     const incomeAt = new Date(date);
-console.log(incomeAt);
+    console.log(incomeAt);
     const newIncome = await prisma.income.create({
       data: {
         amount,
