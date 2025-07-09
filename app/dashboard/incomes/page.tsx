@@ -42,7 +42,7 @@ const IncomeForm: React.FC = () => {
 
 
     try {
-      const response = await fetch("/api/income", {
+      const response = await fetch("/api/income/manage", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
