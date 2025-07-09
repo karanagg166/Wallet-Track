@@ -68,7 +68,7 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="min-h-screen flex flex-col bg-gradient-to-r from-blue-50 to-blue-200">
+    <main className="min-h-screen flex flex-col">
 
        {/* Summary Section */}
       <section className="px-6 py-6 md:px-20">

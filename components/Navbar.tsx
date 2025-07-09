@@ -36,10 +36,10 @@ const logout = useLogout();
           Analysis
         </div>
         <div
-          onClick={() => router.push("/dashboard/support")}
+          onClick={() => router.push("/dashboard/aboutus")}
           className="text-gray-700 hover:text-blue-600 font-medium cursor-pointer transition "
         >
-          Support
+          About Us
         </div>
       </div>
 
