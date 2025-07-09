@@ -33,6 +33,8 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
+
+
 export async function DELETE(req: Request) {
   try {
     const user = await getUserFromCookie();
@@ -63,4 +65,3 @@ console.log("hi",exp);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
-
