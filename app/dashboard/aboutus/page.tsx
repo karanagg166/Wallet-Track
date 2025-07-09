@@ -1,6 +1,6 @@
 export default function AnalysisBoard() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-6">
+    <div className="flex flex-col items-center justify-center mt-6 bg-gray-50 p-6">
       <div className="max-w-3xl w-full bg-white rounded-2xl shadow-lg p-8">
         <h1 className="text-4xl font-bold text-center text-gray-800 mb-6">
           About Us
