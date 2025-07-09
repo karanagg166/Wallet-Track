@@ -11,6 +11,7 @@ const schema = z.object({
   amount: z.number().min(1, "Amount must be at least 1"),
   date: z.string().nonempty("Date is required"),
   title: z.string().nonempty("Title is required"),
+  time: z.string().nonempty("Time is required"),
   incomesource:z.string().nonempty("Please specify the income source"),
 });
 type IncomeFormInputs = z.infer<typeof schema>;
@@ -122,6 +123,20 @@ const IncomeForm: React.FC = () => {
               <p className="text-red-400 text-sm mt-1">{errors.date.message}</p>
             )}
           </div>
+           {/* Time */}
+                    <div>
+                      <input
+                        type="time"
+                        {...register("time")}
+                        className={clsx(
+                          "w-full px-4 py-2 rounded-xl bg-white/10 text-white outline-none focus:ring-2 focus:ring-purple-400 transition-all",
+                          errors.time && "border border-red-400"
+                        )}
+                      />
+                      {errors.time && (
+                        <p className="text-red-400 text-sm mt-1">{errors.time.message}</p>
+                      )}
+                    </div>
            <div>
                       <input
                         {...register("incomesource")}
