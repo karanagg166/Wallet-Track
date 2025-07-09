@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 
 export async function GET(req: Request) {
   try {
-    // Get logged-in user from cookies
+   
     const user = await getUserFromCookie();
 
     if (!user || !user.id) {
@@ -19,8 +19,6 @@ export async function GET(req: Request) {
         userId: user.id,
       }
     });
-
-    // Fetch all incomes for the user
     const incomes = await prisma.income.findMany({
       where: {
         userId: user.id,

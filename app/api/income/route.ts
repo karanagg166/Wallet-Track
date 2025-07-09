@@ -13,9 +13,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { amount, title, date,incomesource } = await req.json();
+    const { amount, title, date,incomesource ,time} = await req.json();
 
-    const incomeAt = new Date(date);
+    const incomeAt = new Date(`${date}T${time}`);
     console.log(incomeAt);
     const newIncome = await prisma.income.create({
       data: {

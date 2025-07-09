@@ -26,13 +26,10 @@ export default function TransactionPage() {
         const expenses = json.data;
 
         // Sort by date descending
-        const sorted = expenses.sort(
-          (a: Expense, b: Expense) =>
-            new Date(b.expenseAt).getTime() -
-            new Date(a.expenseAt).getTime()
-        );
+       
+        setTransactions(expenses);
+       
 
-        setTransactions(sorted);
       } catch (error) {
         console.error(error);
       } finally {
@@ -43,7 +40,7 @@ export default function TransactionPage() {
     fetchExpenses();
   }, []);
 
-  const deleteTransaction = async (id: string) => {
+  const deleteExpense = async (id: string) => {
     const confirmed = confirm("Are you sure you want to delete this transaction?");
     if (!confirmed) return;
 
@@ -65,6 +62,30 @@ export default function TransactionPage() {
       alert("Could not delete transaction.");
     }
   };
+ const deleteIncome = async (id: string) => {
+    const confirmed = confirm("Are you sure you want to delete this transaction?");
+    if (!confirmed) return;
+
+    try {
+      const res = await fetch(`/api/income`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ incomeId: id }),
+      });
+
+      if (!res.ok) throw new Error("Failed to delete transaction");
+
+      // Remove from UI
+      setTransactions((prev) => prev.filter((txn) => txn.id !== id));
+    } catch (error) {
+      console.error(error);
+      alert("Could not delete transaction.");
+    }
+  };
+
+
 
   if (loading) {
     return <div className="p-4 text-gray-500">Loading transactions...</div>;
@@ -94,39 +115,67 @@ export default function TransactionPage() {
 
       {transactions.length === 0 ? (
         <p className="text-center text-gray-500">No transactions found.</p>
-      ) : (
-        <ul className="space-y-3">
-          {transactions.map((txn) => (
-            <li
-              key={txn.id}
-              className="border border-gray-200 rounded-xl p-4 shadow hover:shadow-md transition flex justify-between items-center bg-white"
-            >
-              {/* Left side */}
-              <div>
-                <h2 className="text-lg font-semibold text-gray-800">
-                  {txn.title}
-                </h2>
-                <p className="text-sm text-gray-500">{txn.category}</p>
-                <p className="text-xs text-gray-400">
-                  {new Date(txn.expenseAt).toLocaleString()}
-                </p>
-              </div>
+      ) :  (
+       <ul className="space-y-3">
+  {transactions.map((txn) =>
+    txn.type === "expense" ? (
+      <li
+        key={txn.id}
+        className="border border-gray-200 rounded-xl p-4 shadow hover:shadow-md transition flex justify-between items-center bg-white"
+      >
+        {/* Left side */}
+        <div>
+          <h2 className="text-lg font-semibold text-gray-800">{txn.title}</h2>
+          <p className="text-sm text-gray-500">{txn.category}</p>
+          <p className="text-xs text-gray-400">
+            {new Date(txn.expenseAt).toLocaleString()}
+          </p>
+        </div>
 
-              {/* Right side: amount + delete button */}
-              <div className="flex items-center gap-4">
-                <p className="text-lg font-bold text-green-600">
-                  ₹{txn.amount.toFixed(2)}
-                </p>
-                <button
-                  onClick={() => deleteTransaction(txn.id)}
-                  className="px-3 py-1.5 text-sm rounded-lg bg-black text-white hover:bg-gray-800 transition"
-                >
-                  Delete
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
+        {/* Right side: amount + delete button */}
+        <div className="flex items-center gap-4">
+          <p className="text-lg font-bold text-red-600">
+            ₹{txn.amount.toFixed(2)}
+          </p>
+          <button
+            onClick={() => deleteExpense(txn.id)}
+            className="px-3 py-1.5 text-sm rounded-lg bg-black text-white hover:bg-gray-800 transition"
+          >
+            Delete
+          </button>
+        </div>
+      </li>
+    ) : (
+      <li
+        key={txn.id}
+        className="border border-gray-200 rounded-xl p-4 shadow hover:shadow-md transition flex justify-between items-center bg-white"
+      >
+        {/* Left side */}
+        <div>
+          <h2 className="text-lg font-semibold text-gray-800">{txn.title}</h2>
+          <p className="text-sm text-gray-500">{txn.category}</p>
+          <p className="text-xs text-gray-400">
+            {new Date(txn.incomeAt).toLocaleString()}
+          </p>
+        </div>
+
+        {/* Right side: amount + delete button */}
+        <div className="flex items-center gap-4">
+          <p className="text-lg font-bold text-green-600">
+            ₹{txn.amount.toFixed(2)}
+          </p>
+          <button
+            onClick={() => deleteIncome(txn.id)}
+            className="px-3 py-1.5 text-sm rounded-lg bg-black text-white hover:bg-gray-800 transition"
+          >
+            Delete
+          </button>
+        </div>
+      </li>
+    )
+  )}
+</ul>
+
       )}
     </div>
   );
