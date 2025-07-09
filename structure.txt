@@ -1,0 +1,59 @@
+.
+├── app
+│   ├── api
+│   │   ├── auth
+│   │   ├── expense
+│   │   ├── getExpenses
+│   │   ├── getIncomes
+│   │   ├── getTransactions
+│   │   ├── income
+│   │   └── signup
+│   ├── dashboard
+│   │   ├── aboutus
+│   │   ├── analysis
+│   │   ├── expenses
+│   │   ├── incomes
+│   │   ├── layout.tsx
+│   │   ├── page.tsx
+│   │   └── transactions
+│   ├── favicon.ico
+│   ├── globals.css
+│   ├── layout.tsx
+│   ├── login
+│   │   └── page.tsx
+│   ├── page.tsx
+│   ├── public
+│   │   └── forgot-password
+│   ├── signup
+│   │   └── page.tsx
+│   └── utils
+│       └── logout.tsx
+├── components
+│   └── Navbar.tsx
+├── context
+├── features
+├── hooks
+├── lib
+│   └── cookies
+│       ├── CookieUtils.ts
+│       ├── deleteUserCookies.ts
+│       └── setUserCookies.ts
+├── middleware.ts
+├── next-env.d.ts
+├── package-lock.json
+├── package.json
+├── postcss.config.js
+├── prisma
+│   └── schema.prisma
+├── public
+│   ├── 10944902.png
+│   ├── Avatar_Icon.png
+│   ├── ftmoney.svg
+│   └── layout.tsx
+├── routes
+├── structure.txt
+├── tailwind.config.js
+├── test.ts
+└── tsconfig.json
+
+30 directories, 27 files

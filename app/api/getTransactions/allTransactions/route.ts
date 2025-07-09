@@ -19,12 +19,13 @@ export async function GET(req: Request) {
         userId: user.id,
       }
     });
+    const totalexpense = expenses.reduce((sum, expense) => sum + expense.amount, 0);
     const incomes = await prisma.income.findMany({
       where: {
         userId: user.id,
       }
     });
-
+ const totalincome = incomes.reduce((sum, income) => sum + income.amount, 0);
     // Add a `type` field to distinguish them and normalize date field
     const allTransactions = [
       ...expenses.map((e) => ({
@@ -44,13 +45,18 @@ export async function GET(req: Request) {
       (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
     );
 
-    return NextResponse.json(
-      {
-        message: "Transactions successfully extracted",
-        data: allTransactions,
-      },
-      { status: 200 }
-    );
+  return NextResponse.json(
+  {
+    message: "Transactions successfully extracted",
+    data: {
+      transactions: allTransactions,
+       totalexpense,
+      totalincome
+    }
+  },
+  { status: 200 }
+);
+
   } catch (error) {
     console.error("Error getting transactions:", error);
     return NextResponse.json(

@@ -20,43 +20,22 @@ export default function Home() {
   useEffect(() => {
     const fetchSummary = async () => {
       try {
-        const [expensesRes, incomesRes] = await Promise.all([
-          fetch("/api/getExpenses"),
-          fetch("/api/getIncomes"),
-        ]);
+        
+       const res = await fetch("/api/getTransactions/allTransactions", {
+  method: "GET",
+  headers: { "Content-Type": "application/json" },
+  credentials: "include",
+});
 
-        const expensesData = await expensesRes.json();
-        const incomesData = await incomesRes.json();
 
-        const now = new Date();
-        const currentMonth = now.getMonth();
-        const currentYear = now.getFullYear();
+const result = await res.json();
 
-        const expenses = expensesData.data.filter((e: any) => {
-          const date = new Date(e.expenseAt);
-          return (
-            date.getMonth() === currentMonth && date.getFullYear() === currentYear
-          );
-        });
 
-        const incomes = incomesData.data.filter((i: any) => {
-          const date = new Date(i.incomeAt);
-          return (
-            date.getMonth() === currentMonth && date.getFullYear() === currentYear
-          );
-        });
+const { totalincome, totalexpense } = result.data;
+const netBalance = totalincome - totalexpense;
 
-        const totalExpense = expenses.reduce(
-          (sum: number, e: any) => sum + e.amount,
-          0
-        );
-        const totalIncome = incomes.reduce(
-          (sum: number, i: any) => sum + i.amount,
-          0
-        );
-        const netBalance = totalIncome - totalExpense;
+setSummary({ totalIncome: totalincome, totalExpense: totalexpense, netBalance });
 
-        setSummary({ totalIncome, totalExpense, netBalance });
       } catch (err) {
         console.error("Error fetching summary:", err);
       } finally {

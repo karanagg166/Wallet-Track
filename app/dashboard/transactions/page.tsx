@@ -20,7 +20,7 @@ export default function TransactionPage() {
   useEffect(() => {
     const fetchExpenses = async () => {
       try {
-        const res = await fetch("/api/getTransactions");
+        const res = await fetch("/api/getTransactions/allTransactions");
         if (!res.ok) throw new Error("Failed to fetch expenses");
         const json = await res.json();
         const expenses = json.data;
@@ -45,7 +45,7 @@ export default function TransactionPage() {
     if (!confirmed) return;
 
     try {
-      const res = await fetch(`/api/expense`, {
+      const res = await fetch(`/api/expense/manage`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -53,9 +53,10 @@ export default function TransactionPage() {
         body: JSON.stringify({ expenseId: id }),
       });
 
+
       if (!res.ok) throw new Error("Failed to delete transaction");
 
-      // Remove from UI
+     
       setTransactions((prev) => prev.filter((txn) => txn.id !== id));
     } catch (error) {
       console.error(error);
@@ -67,7 +68,7 @@ export default function TransactionPage() {
     if (!confirmed) return;
 
     try {
-      const res = await fetch(`/api/income`, {
+      const res = await fetch(`/api/income/manage`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

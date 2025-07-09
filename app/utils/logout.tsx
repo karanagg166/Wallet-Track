@@ -7,7 +7,7 @@ export function useLogout() {
 
   const logout = async () => {
     try {
-      const res = await fetch('/api/auth', {
+      const res = await fetch('/api/auth/login', {
         method: 'DELETE',
       });
 
@@ -15,7 +15,7 @@ export function useLogout() {
         throw new Error('Logout failed');
       }
 
-      router.push('/login');
+      router.push('/auth/login');
     } catch (err) {
       console.error('Logout error:', err);
       alert('Error logging out. Please try again.');

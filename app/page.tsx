@@ -12,13 +12,13 @@ export default function Home() {
         <div className="text-2xl font-bold text-blue-600">WalletTrack</div>
         <div className="flex gap-4">
           <div
-            onClick={() => router.push("/login")}
+            onClick={() => router.push("/auth/login")}
             className="text-white bg-blue-600 px-4 py-2 rounded-lg hover:bg-blue-700 cursor-pointer transition"
           >
             Login
           </div>
           <div
-            onClick={() => router.push("/signup")}
+            onClick={() => router.push("/auth/signup")}
             className="text-white bg-blue-600 px-4 py-2 rounded-lg hover:bg-blue-700 cursor-pointer transition"
           >
             Sign Up
