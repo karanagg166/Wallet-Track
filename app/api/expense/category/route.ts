@@ -38,14 +38,14 @@ export async function POST(req: Request) {
 
     const { name } = await req.json();
 
-    const existingCategory = await prisma.category.findUnique({
+    const existingCategory = await prisma.category.findMany({
       where: {
         userId: user.id,
         name,
       },
     });
-
-    if (existingCategory) {
+     console.log(existingCategory);
+    if (existingCategory.length>0) {
       return NextResponse.json({ message: "This category already exists" }, { status: 409 });
     }
 
