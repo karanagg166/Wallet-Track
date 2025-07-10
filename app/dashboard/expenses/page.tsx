@@ -1,22 +1,32 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
+import useAddCategory from "@/hooks/category/useAddCategory";
+import useDeleteCategory from "@/hooks/category/useDeleteCategory";
+import useFetchCategories from "@/hooks/category/useFetchCategories";
+
+type Category = {
+  id: string;
+  name: string;
+  userId: string;
+  createdAt: string;
+};
 
 const schema = z.object({
   amount: z.number().min(1, "Amount must be at least 1"),
-  category: z.string().nonempty("Category is required"),
   paymentmethod: z.enum(["cash", "card", "upi", "e-ruppee", "netbanking", "other"], {
     errorMap: () => ({ message: "Select a payment method" }),
   }),
   date: z.string().nonempty("Date is required"),
   time: z.string().nonempty("Time is required"),
   title: z.string().nonempty("Title is required"),
+  category: z.string().nonempty("Category is required"),
 });
 
 type ExpenseFormInputs = z.infer<typeof schema>;
@@ -30,21 +40,33 @@ const ExpenseForm: React.FC = () => {
     resolver: zodResolver(schema),
   });
 
+  const { categories, loading, error, setCategories } = useFetchCategories();
+  const { addCategory } = useAddCategory();
+  const { deleteCategory } = useDeleteCategory();
+  const router = useRouter();
+  const [newCategory, setNewCategory] = useState("");
+const [showNewCategoryInput, setShowNewCategoryInput] = useState(false);
 
-  const router= useRouter();
- 
+  const onAddCategory = async (name: string) => {
+    const result = await addCategory(name);
+    
+    if (result && result.data) {
+      setCategories((prev) => [...prev, result.data]);
+    } else {
+      alert(result?.message || "Failed to add category");
+    }
+  };
 
-
-
-
-
-
+  const onDeleteCategory = async (id: string) => {
+    const result = await deleteCategory(id);
+    if (result && result.message === "Category deleted successfully") {
+      setCategories((prev) => prev.filter((cat) => cat.id !== id));
+    } else {
+      alert("Failed to delete category");
+    }
+  };
 
   const onSubmit = async (data: ExpenseFormInputs) => {
-  
-    
-
-
     try {
       const response = await fetch("/api/expense/manage", {
         method: "POST",
@@ -55,17 +77,16 @@ const ExpenseForm: React.FC = () => {
       const result = await response.json();
 
       if (!response.ok) {
-        alert(result.error || "Login failed");
+        alert(result.error || "Failed to add expense");
       } else {
-        alert("Expense Successfully added");
+        alert("Expense successfully added");
         router.push("/dashboard");
       }
     } catch (error) {
-      console.error("Login error:", error);
+      console.error("Add expense error:", error);
       alert("Something went wrong.");
     }
   };
-
 
   return (
     <motion.div
@@ -109,20 +130,74 @@ const ExpenseForm: React.FC = () => {
             )}
           </div>
 
-          {/* Category */}
-          <div>
-            <input
-              {...register("category")}
-              placeholder="Category"
-              className={clsx(
-                "w-full px-4 py-2 rounded-xl bg-white/10 text-white placeholder-white/60 outline-none focus:ring-2 focus:ring-purple-400 transition-all",
-                errors.category && "border border-red-400"
-              )}
-            />
-            {errors.category && (
-              <p className="text-red-400 text-sm mt-1">{errors.category.message}</p>
-            )}
-          </div>
+         {/* Category */}
+<div>
+  {showNewCategoryInput ? (
+    <div className="flex gap-2">
+      <input
+        type="text"
+        placeholder="New category name"
+        value={newCategory}
+        onChange={(e) => setNewCategory(e.target.value)}
+        className="flex-1 px-4 py-2 rounded-xl bg-white/10 text-white placeholder-white/60 outline-none focus:ring-2 focus:ring-purple-400 transition-all"
+      />
+      <button
+        type="button"
+        onClick={async () => {
+          if (newCategory.trim()) {
+            const added = await onAddCategory(newCategory.trim());
+            setNewCategory("");
+            setShowNewCategoryInput(false);
+            if (added?.data?.name) {
+              setValue("category", added.data.name); // set selected category
+            }
+          }
+        }}
+        className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+      >
+        Add
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          setShowNewCategoryInput(false);
+          setNewCategory("");
+        }}
+        className="text-white px-3 py-2"
+      >
+        Cancel
+      </button>
+    </div>
+  ) : (
+    <select
+      {...register("category")}
+      className={clsx(
+        "w-full px-4 py-2 rounded-xl bg-white/10 text-white outline-none focus:ring-2 focus:ring-purple-400 transition-all",
+        errors.category && "border border-red-400"
+      )}
+      defaultValue=""
+      onChange={(e) => {
+        const value = e.target.value;
+        if (value === "__add_new__") {
+          setShowNewCategoryInput(true);
+        }
+      }}
+    >
+      <option value="" disabled hidden>
+        Select Category
+      </option>
+      {categories.map((cat) => (
+        <option key={cat.id} value={cat.name}>
+          {cat.name}
+        </option>
+      ))}
+      <option value="__add_new__">+ Add new category...</option>
+    </select>
+  )}
+  {errors.category && (
+    <p className="text-red-400 text-sm mt-1">{errors.category.message}</p>
+  )}
+</div>
 
           {/* Payment Method */}
           <div>
@@ -189,6 +264,47 @@ const ExpenseForm: React.FC = () => {
             Submit Expense
           </motion.button>
         </form>
+
+        {/* Category Manager */}
+        <div className="mt-8">
+          <h3 className="text-white text-lg font-semibold mb-2">Manage Categories</h3>
+          <div className="flex gap-2 mb-4">
+            <input
+              type="text"
+              value={newCategory}
+              onChange={(e) => setNewCategory(e.target.value)}
+              placeholder="New Category"
+              className="flex-1 px-3 py-2 rounded bg-white/20 placeholder-white/70 text-white"
+            />
+            <button
+              className="bg-purple-600 px-4 py-2 rounded hover:bg-purple-700 text-white"
+              onClick={async () => {
+                if (newCategory.trim()) {
+                  await onAddCategory(newCategory.trim());
+                  setNewCategory("");
+                }
+              }}
+            >
+              Add
+            </button>
+          </div>
+          <ul className="space-y-2">
+            {categories.map((cat) => (
+              <li
+                key={cat.id}
+                className="flex justify-between items-center bg-white/10 px-3 py-2 rounded text-white"
+              >
+                <span>{cat.name}</span>
+                <button
+                  onClick={() => onDeleteCategory(cat.id)}
+                  className="text-sm text-red-400 hover:underline"
+                >
+                  Delete
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </motion.div>
   );
