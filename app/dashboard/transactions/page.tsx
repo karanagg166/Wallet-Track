@@ -23,10 +23,10 @@ export default function TransactionPage() {
         const res = await fetch("/api/getTransactions/allTransactions");
         if (!res.ok) throw new Error("Failed to fetch expenses");
         const json = await res.json();
-        const expenses = json.data;
+        const expenses = json.data.transactions;
 
         // Sort by date descending
-       
+       console.log(expenses);
         setTransactions(expenses);
        
 
