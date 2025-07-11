@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-
+import fetchCategories from '@/hooks/category/useFetchCategories'
 type Transaction = {
   id: string;
   title: string;
@@ -18,8 +18,8 @@ export default function TransactionPage() {
   const router = useRouter();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
-  const [categories, setCategories] = useState<string[]>([]); // User's categories
-
+  const {categories}=fetchCategories();
+  
   // Filter states
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -28,7 +28,7 @@ export default function TransactionPage() {
 
   useEffect(() => {
     fetchTransactions();
-    fetchCategories();
+   
   }, []);
 
   const fetchTransactions = async (filters = {}) => {
@@ -56,16 +56,7 @@ export default function TransactionPage() {
     }
   };
 
-  const fetchCategories = async () => {
-    try {
-      const res = await fetch("/api/getCategories");
-      if (!res.ok) throw new Error("Failed to fetch categories");
-      const json = await res.json();
-      setCategories(json.data); // Assumes API returns { data: ["Food", "Rent", ...] }
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-    }
-  };
+  
 
   const handleFilter = (e: React.FormEvent) => {
     e.preventDefault();
@@ -158,8 +149,8 @@ export default function TransactionPage() {
           >
             <option value="">All Categories</option>
             {categories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
+              <option key={cat.id} value={cat.name}>
+                {cat.name}
               </option>
             ))}
           </select>
