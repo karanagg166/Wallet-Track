@@ -10,7 +10,7 @@ import {
   CartesianGrid,
   ResponsiveContainer,
 } from "recharts";
-
+import MyBarChart from '@/components/charts/barcharts/route'
 export default function OverviewPage() {
   const [totalIncome, setTotalIncome] = useState(0);
   const [totalExpenses, setTotalExpenses] = useState(0);
@@ -61,7 +61,11 @@ export default function OverviewPage() {
 
         const startISO = thirtyDaysAgo.toISOString().split("T")[0];
         const endISO = today.toISOString().split("T")[0];
-
+const chartData = [
+    { name: "Jan", value1: 40, value2: 60 },
+    { name: "Feb", value1: 55, value2: 35 },
+    { name: "Mar", value1: 30, value2: 50 },
+  ];
         // Fetch expenses for chart
         const expenseChartRes = await fetch("/api/getTransactions/specificTransactions", {
           method: "POST",
@@ -209,6 +213,11 @@ export default function OverviewPage() {
             </button>
           </div>
         </div>
+
+        <div>
+      <h2 className="text-lg font-bold mb-4">Monthly Comparison</h2>
+     <MyBarChart data={chartData} />
+    </div>
 
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={chartData}>
