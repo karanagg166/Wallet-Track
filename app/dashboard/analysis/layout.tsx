@@ -34,7 +34,7 @@ export default function AnalysisLayout({
       {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-gray-200">
         <div className="p-6 text-2xl font-bold text-indigo-600">
-          AnalyzeYourWallet
+          Analyze Wallet
         </div>
 
         <nav className="flex flex-col gap-1 mt-4">
