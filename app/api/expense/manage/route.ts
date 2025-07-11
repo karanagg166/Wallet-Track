@@ -12,24 +12,24 @@ export async function POST(req: Request) {
     if (!user || !user.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+    console.log(user.id);   
 
     const { amount, title, category, date, time, paymentmethod } = await req.json();
 
-    // Combine date and time into a valid DateTime
     const expenseAt = new Date(`${date}T${time}`);
-
+   
     const newExpense = await prisma.expense.create({
       data: {
         amount,
         title,
-        category,
+        categoryId:category,
         paymentmethod,
         expenseAt,           // this should match your model
         userId: user.id,     // from the JWT
       },
     });
 
-    return NextResponse.json({ message: "Expense created", data: newExpense }, { status: 201 });
+    return NextResponse.json({ message: "Expense created", data: newExpense }, { status: 200 });
   } catch (error) {
     console.error('Error creating expense:', error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
@@ -45,14 +45,14 @@ export async function DELETE(req: Request) {
     }
     const { expenseId } = await req.json();
 
-    console.log(expenseId);
+   
     
     if (!expenseId) {
       return NextResponse.json({ error: "Expense ID is required" }, { status: 400 });
     }
 
     const exp = await prisma.expense.findUnique({ where: { id: expenseId } });
-console.log("hi",exp);
+
     if (!exp) {
       return NextResponse.json({ error: "Expense does not exist" }, { status: 404 });
     }

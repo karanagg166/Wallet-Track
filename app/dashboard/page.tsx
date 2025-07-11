@@ -33,7 +33,7 @@ const result = await res.json();
 
 const { totalincome, totalexpense } = result.data;
 const netBalance = totalincome - totalexpense;
-
+console.log(totalexpense);
 setSummary({ totalIncome: totalincome, totalExpense: totalexpense, netBalance });
 
       } catch (err) {

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -35,6 +35,7 @@ const ExpenseForm: React.FC = () => {
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<ExpenseFormInputs>({
     resolver: zodResolver(schema),
@@ -44,14 +45,15 @@ const ExpenseForm: React.FC = () => {
   const { addCategory } = useAddCategory();
   const { deleteCategory } = useDeleteCategory();
   const router = useRouter();
+
   const [newCategory, setNewCategory] = useState("");
-const [showNewCategoryInput, setShowNewCategoryInput] = useState(false);
+  const [showNewCategoryInput, setShowNewCategoryInput] = useState(false);
 
   const onAddCategory = async (name: string) => {
     const result = await addCategory(name);
-    
     if (result && result.data) {
       setCategories((prev) => [...prev, result.data]);
+      return result;
     } else {
       alert(result?.message || "Failed to add category");
     }
@@ -68,6 +70,7 @@ const [showNewCategoryInput, setShowNewCategoryInput] = useState(false);
 
   const onSubmit = async (data: ExpenseFormInputs) => {
     try {
+      console.log(data.category);
       const response = await fetch("/api/expense/manage", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -109,9 +112,7 @@ const [showNewCategoryInput, setShowNewCategoryInput] = useState(false);
                 errors.title && "border border-red-400"
               )}
             />
-            {errors.title && (
-              <p className="text-red-400 text-sm mt-1">{errors.title.message}</p>
-            )}
+            {errors.title && <p className="text-red-400 text-sm mt-1">{errors.title.message}</p>}
           </div>
 
           {/* Amount */}
@@ -125,79 +126,79 @@ const [showNewCategoryInput, setShowNewCategoryInput] = useState(false);
                 errors.amount && "border border-red-400"
               )}
             />
-            {errors.amount && (
-              <p className="text-red-400 text-sm mt-1">{errors.amount.message}</p>
-            )}
+            {errors.amount && <p className="text-red-400 text-sm mt-1">{errors.amount.message}</p>}
           </div>
 
-         {/* Category */}
-<div>
-  {showNewCategoryInput ? (
-    <div className="flex gap-2">
-      <input
-        type="text"
-        placeholder="New category name"
-        value={newCategory}
-        onChange={(e) => setNewCategory(e.target.value)}
-        className="flex-1 px-4 py-2 rounded-xl bg-white/10 text-white placeholder-white/60 outline-none focus:ring-2 focus:ring-purple-400 transition-all"
-      />
-      <button
-        type="button"
-        onClick={async () => {
-          if (newCategory.trim()) {
-            const added = await onAddCategory(newCategory.trim());
-            setNewCategory("");
-            setShowNewCategoryInput(false);
-            if (added?.data?.name) {
-              setValue("category", added.data.name); // set selected category
-            }
-          }
-        }}
-        className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-      >
-        Add
-      </button>
-      <button
-        type="button"
-        onClick={() => {
-          setShowNewCategoryInput(false);
-          setNewCategory("");
-        }}
-        className="text-white px-3 py-2"
-      >
-        Cancel
-      </button>
-    </div>
-  ) : (
-    <select
-      {...register("category")}
-      className={clsx(
-        "w-full px-4 py-2 rounded-xl bg-white/10 text-white outline-none focus:ring-2 focus:ring-purple-400 transition-all",
-        errors.category && "border border-red-400"
-      )}
-      defaultValue=""
-      onChange={(e) => {
-        const value = e.target.value;
-        if (value === "__add_new__") {
-          setShowNewCategoryInput(true);
-        }
-      }}
-    >
-      <option value="" disabled hidden>
-        Select Category
-      </option>
-      {categories.map((cat) => (
-        <option key={cat.id} value={cat.name}>
-          {cat.name}
-        </option>
-      ))}
-      <option value="__add_new__">+ Add new category...</option>
-    </select>
-  )}
-  {errors.category && (
-    <p className="text-red-400 text-sm mt-1">{errors.category.message}</p>
-  )}
-</div>
+          {/* Category */}
+          <div>
+            {showNewCategoryInput ? (
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="New category name"
+                  value={newCategory}
+                  onChange={(e) => setNewCategory(e.target.value)}
+                  className="flex-1 px-4 py-2 rounded-xl bg-white/10 text-white placeholder-white/60 outline-none focus:ring-2 focus:ring-purple-400 transition-all"
+                />
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (newCategory.trim()) {
+                      const added = await onAddCategory(newCategory.trim());
+                      setNewCategory("");
+                      setShowNewCategoryInput(false);
+                      if (added?.data?.name) {
+                        setValue("category", added.data.name);
+                      }
+                    }
+                  }}
+                  className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                >
+                  Add
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowNewCategoryInput(false);
+                    setNewCategory("");
+                  }}
+                  className="text-white px-3 py-2"
+                >
+                  Cancel
+                </button>
+              </div>
+            ) : (
+              <select
+                {...register("category")}
+                className={clsx(
+                  "w-full px-4 py-2 rounded-xl bg-white/10 text-white outline-none focus:ring-2 focus:ring-purple-400 transition-all",
+                  errors.category && "border border-red-400"
+                )}
+                defaultValue=""
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value === "__add_new__") {
+                    setShowNewCategoryInput(true);
+                  } else {
+                    setValue("category", value);
+                  }
+                }}
+              >
+                <option value="" disabled hidden>
+                  Select Category
+                </option>
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </option>
+                ))}
+                <option value="__add_new__">+ Add new category...</option>
+              </select>
+            )}
+            {errors.category && (
+              <p className="text-red-400 text-sm mt-1">{errors.category.message}</p>
+            )}
+          </div>
 
           {/* Payment Method */}
           <div>
@@ -234,9 +235,7 @@ const [showNewCategoryInput, setShowNewCategoryInput] = useState(false);
                 errors.date && "border border-red-400"
               )}
             />
-            {errors.date && (
-              <p className="text-red-400 text-sm mt-1">{errors.date.message}</p>
-            )}
+            {errors.date && <p className="text-red-400 text-sm mt-1">{errors.date.message}</p>}
           </div>
 
           {/* Time */}
@@ -249,9 +248,7 @@ const [showNewCategoryInput, setShowNewCategoryInput] = useState(false);
                 errors.time && "border border-red-400"
               )}
             />
-            {errors.time && (
-              <p className="text-red-400 text-sm mt-1">{errors.time.message}</p>
-            )}
+            {errors.time && <p className="text-red-400 text-sm mt-1">{errors.time.message}</p>}
           </div>
 
           {/* Submit Button */}

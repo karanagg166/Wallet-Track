@@ -17,7 +17,11 @@ export default function useFetchCategories() {
       try {
         setLoading(true);
         setError(null);
-        const res = await fetch("/api/category");
+     const res = await fetch("/api/expense/category", {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+      });
         const data = await res.json();
         setCategories(data.data || []);
       } catch (err) {

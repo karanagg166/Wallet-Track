@@ -28,8 +28,8 @@ model Expense {
   user          User      @relation(fields: [userId], references: [id])
   paymentmethod String
   expenseAt     DateTime  // date + time combined
-  categoryId String
-  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId    String
+  category      Category @relation(fields: [categoryId], references: [id])
 }
 
 model Income {

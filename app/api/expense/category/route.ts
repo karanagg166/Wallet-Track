@@ -3,30 +3,23 @@ import { PrismaClient } from '@prisma/client';
 import { getUserFromCookie } from '@/lib/cookies/CookieUtils';
 
 const prisma = new PrismaClient();
-
-export async function GET(req:Request) {
-     try{
-    const user=await getUserFromCookie();
-    if(!user || !user.id){
-        return NextResponse.json({error:"not authorized"} ,{status :401});
+export async function GET(req: Request) {
+  try {
+    const user = await getUserFromCookie();
+    if (!user || !user.id) {
+      return NextResponse.json({ error: "Not authorized" }, { status: 401 });
     }
-   const categories = await prisma.category.findMany({
-  where: { userId: user.id },
-});
 
-    return NextResponse.json({message:"all category",data:categories},{status:500});
+    const categories = await prisma.category.findMany({
+      where: { userId: user.id },
+    });
 
+    return NextResponse.json({ message: "All categories", data: categories }, { status: 200 });
 
-
-
-    }
-    catch (err){
-         console.error('Error creating expense:', err);
+  } catch (err) {
+    console.error("Error fetching categories:", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
-    }
-
-
-
+  }
 }
 
 export async function POST(req: Request) {
@@ -56,7 +49,7 @@ export async function POST(req: Request) {
       },
     });
 
-    return NextResponse.json({ message: "New category added", data: newCategory }, { status: 201 });
+    return NextResponse.json({ message: "New category added", data: newCategory }, { status: 200 });
   } catch (err) {
     console.error("Error creating category:", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
