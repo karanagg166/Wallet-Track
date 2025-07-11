@@ -13,7 +13,7 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Fetch all expenses for the user
+      console.log(user.id);
     const expenses = await prisma.expense.findMany({
       where: {
         userId: user.id,
@@ -44,7 +44,7 @@ export async function GET(req: Request) {
     allTransactions.sort(
       (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
     );
-
+console.log(allTransactions);
   return NextResponse.json(
   {
     message: "Transactions successfully extracted",
