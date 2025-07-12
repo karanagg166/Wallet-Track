@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import fetchCategories from '@/hooks/category/useFetchCategories'
+import fetchCategories from "@/hooks/category/useFetchCategories";
+
 type Transaction = {
   id: string;
   title: string;
@@ -18,17 +19,18 @@ export default function TransactionPage() {
   const router = useRouter();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
-  const {categories}=fetchCategories();
-  
+  const { categories } = fetchCategories();
+
   // Filter states
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [category, setCategory] = useState("");
   const [type, setType] = useState<"" | "expense" | "income">("");
+  const [incomesource, setincomesource] = useState("");
+  const [paymentmethod, setpaymentmethod] = useState("");
 
   useEffect(() => {
     fetchTransactions();
-   
   }, []);
 
   const fetchTransactions = async (filters = {}) => {
@@ -41,8 +43,8 @@ export default function TransactionPage() {
       });
 
       if (!res.ok) throw new Error("Failed to fetch transactions");
-      const json = await res.json();
 
+      const json = await res.json();
       const normalized = json.data.map((txn: any) => ({
         ...txn,
         type: txn.expenseAt ? "expense" : "income",
@@ -56,8 +58,6 @@ export default function TransactionPage() {
     }
   };
 
-  
-
   const handleFilter = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -66,6 +66,8 @@ export default function TransactionPage() {
       ...(endDate && { date2: endDate }),
       ...(category && { category }),
       ...(type && { type }),
+      ...(incomesource && { incomesource }),
+      ...(paymentmethod && { paymentmethod }),
     };
 
     fetchTransactions(filters);
@@ -80,14 +82,11 @@ export default function TransactionPage() {
       const res = await fetch(endpoint, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          [`${txn.type}Id`]: txn.id,
-        }),
+        body: JSON.stringify({ [`${txn.type}Id`]: txn.id }),
       });
 
       if (!res.ok) throw new Error("Failed to delete transaction");
 
-      // Update UI
       setTransactions((prev) => prev.filter((t) => t.id !== txn.id));
     } catch (error) {
       console.error(error);
@@ -122,6 +121,7 @@ export default function TransactionPage() {
         onSubmit={handleFilter}
         className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6 grid grid-cols-1 md:grid-cols-4 gap-4"
       >
+        {/* Dates – always visible */}
         <div>
           <label className="block text-sm font-medium text-gray-600 mb-1">Start Date</label>
           <input
@@ -140,21 +140,59 @@ export default function TransactionPage() {
             className="border border-gray-300 rounded-lg p-2 w-full"
           />
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-600 mb-1">Category</label>
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className="border border-gray-300 rounded-lg p-2 w-full"
-          >
-            <option value="">All Categories</option>
-            {categories.map((cat) => (
-              <option key={cat.id} value={cat.name}>
-                {cat.name}
-              </option>
-            ))}
-          </select>
-        </div>
+
+        {/* Show for expense or all */}
+        {(type === "expense" || type === "") && (
+          <>
+            <div>
+              <label className="block text-sm font-medium text-gray-600 mb-1">Category</label>
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="border border-gray-300 rounded-lg p-2 w-full"
+              >
+                <option value="">All Categories</option>
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.name}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-600 mb-1">Payment Method</label>
+              <select
+                value={paymentmethod}
+                onChange={(e) => setpaymentmethod(e.target.value)}
+                className="border border-gray-300 rounded-lg p-2 w-full"
+              >
+                <option value="">All</option>
+                <option value="cash">Cash</option>
+                <option value="upi">UPI</option>
+                <option value="card">Card</option>
+              </select>
+            </div>
+          </>
+        )}
+
+        {/* Show for income or all */}
+        {(type === "income" || type === "") && (
+          <div>
+            <label className="block text-sm font-medium text-gray-600 mb-1">Income Source</label>
+            <select
+              value={incomesource}
+              onChange={(e) => setincomesource(e.target.value)}
+              className="border border-gray-300 rounded-lg p-2 w-full"
+            >
+              <option value="">All</option>
+              <option value="salary">Salary</option>
+              {/* Add more options if needed */}
+            </select>
+          </div>
+        )}
+
+        {/* Type – always visible */}
         <div>
           <label className="block text-sm font-medium text-gray-600 mb-1">Type</label>
           <select
@@ -167,6 +205,7 @@ export default function TransactionPage() {
             <option value="income">Income</option>
           </select>
         </div>
+
         <div className="md:col-span-4">
           <button
             type="submit"
@@ -191,15 +230,12 @@ export default function TransactionPage() {
             >
               {/* Left side */}
               <div>
-                <h2 className="text-lg font-semibold text-gray-800">
-                  {txn.title}
-                </h2>
+                <h2 className="text-lg font-semibold text-gray-800">{txn.title}</h2>
                 <p className="text-sm text-gray-500">{txn.category}</p>
                 <p className="text-xs text-gray-400">
-                  {new Date(
-                    txn.expenseAt ?? txn.incomeAt ?? ""
-                  ).toLocaleString()}
+                  {new Date(txn.expenseAt ?? txn.incomeAt ?? "").toLocaleString()}
                 </p>
+            
               </div>
 
               {/* Right side */}
