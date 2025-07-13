@@ -11,7 +11,7 @@ type SummaryData = {
 
 export default function Home() {
   const router = useRouter();
-  //const userName = "Harsh";
+  
   const [userName, setUserName] = useState("User");
   const [summary, setSummary] = useState<SummaryData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -25,7 +25,6 @@ export default function Home() {
           headers: { "Content-Type": "application/json" },
           credentials: "include",
         });
-
         const result = await res.json();
         const { totalincome, totalexpense } = result.data;
         const netBalance = totalincome - totalexpense;
@@ -47,6 +46,28 @@ export default function Home() {
         const {userName: name} = await res2.json();
         console.log(name)
         setUserName(name);
+
+      } catch (err) {
+        console.error("Error fetching summary:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch("/api/charts/expense", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({}),
+        });
+         const data = await res.json();
+      console.log(data); 
 
       } catch (err) {
         console.error("Error fetching summary:", err);

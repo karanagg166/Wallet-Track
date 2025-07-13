@@ -10,7 +10,7 @@ import {
   CartesianGrid,
   ResponsiveContainer,
 } from "recharts";
-import MyBarChart from '@/components/charts/barcharts/route'
+import GroupedBarChart from '@/components/charts/barcharts/both'
 export default function OverviewPage() {
   const [totalIncome, setTotalIncome] = useState(0);
   const [totalExpenses, setTotalExpenses] = useState(0);
@@ -216,7 +216,18 @@ const chartData = [
 
         <div>
       <h2 className="text-lg font-bold mb-4">Monthly Comparison</h2>
-     <MyBarChart data={chartData} />
+   <GroupedBarChart
+  data={chartData.map((d) => ({
+    name: new Date(d.date).toLocaleDateString("en-IN", {
+      month: "short",
+      day: "numeric",
+    }),
+    value1: d.income,
+    value2: d.expense,
+  }))}
+/>
+
+
     </div>
 
         <ResponsiveContainer width="100%" height={300}>
