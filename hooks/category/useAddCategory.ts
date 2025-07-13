@@ -9,7 +9,7 @@ export default function useAddCategory() {
       });
 
       const data = await res.json();
-      console.log(data);
+    
       return data;
     } catch (err) {
       console.error("Failed to add category:", err);
