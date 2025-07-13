@@ -12,6 +12,7 @@ export async function getTokenFromCookie(): Promise<string | null> {
 export async function getUserFromCookie(): Promise<null | {
   id: string;
   email: string;
+  name: string;
   iat?: number;
   exp?: number;
 }> {
@@ -20,9 +21,14 @@ export async function getUserFromCookie(): Promise<null | {
 
   try {
     const { payload } = await jwtVerify(token, JWT_SECRET);
-    return payload as {
+    const cookieStore = await cookies();
+    const username = cookieStore.get("name")?.value;
+
+    const result = {...payload, name: username};
+    return result as {
       id: string;
       email: string;
+      name: string;
       iat?: number;
       exp?: number;
     };

@@ -70,7 +70,7 @@ const ExpenseForm: React.FC = () => {
 
   const onSubmit = async (data: ExpenseFormInputs) => {
     try {
-      console.log(data.category);
+      //console.log(data);
       const response = await fetch("/api/expense/manage", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

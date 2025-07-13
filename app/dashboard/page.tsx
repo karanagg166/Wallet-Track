@@ -11,30 +11,42 @@ type SummaryData = {
 
 export default function Home() {
   const router = useRouter();
-  const userName = "Harsh";
-
+  //const userName = "Harsh";
+  const [userName, setUserName] = useState("User");
   const [summary, setSummary] = useState<SummaryData | null>(null);
   const [loading, setLoading] = useState(true);
 
   // Fetch summary data
   useEffect(() => {
-    const fetchSummary = async () => {
+    const fetchData = async () => {
       try {
-        
-       const res = await fetch("/api/getTransactions/allTransactions", {
-  method: "GET",
-  headers: { "Content-Type": "application/json" },
-  credentials: "include",
-});
+        const res = await fetch("/api/getTransactions/allTransactions", {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+        });
 
+        const result = await res.json();
+        const { totalincome, totalexpense } = result.data;
+        const netBalance = totalincome - totalexpense;
 
-const result = await res.json();
+    
 
+        setSummary({
+          totalIncome: totalincome,
+          totalExpense: totalexpense,
+          netBalance,
+        });
 
-const { totalincome, totalexpense } = result.data;
-const netBalance = totalincome - totalexpense;
-console.log(totalexpense);
-setSummary({ totalIncome: totalincome, totalExpense: totalexpense, netBalance });
+        const res2 = await fetch("/api/getUser", {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+        });
+
+        const {userName: name} = await res2.json();
+        console.log(name)
+        setUserName(name);
 
       } catch (err) {
         console.error("Error fetching summary:", err);
@@ -43,16 +55,15 @@ setSummary({ totalIncome: totalincome, totalExpense: totalexpense, netBalance })
       }
     };
 
-    fetchSummary();
+    fetchData();
   }, []);
 
   return (
     <main className="min-h-screen flex flex-col">
-
-       {/* Summary Section */}
+      {/* Summary Section */}
       <section className="px-6 py-6 md:px-20">
         <h2 className="text-2xl font-bold text-gray-800 mb-4 text-center">
-          This Month's Summary
+          This Month&apos;s Summary
         </h2>
 
         {loading ? (
@@ -97,7 +108,7 @@ setSummary({ totalIncome: totalincome, totalExpense: totalexpense, netBalance })
       </section>
 
       {/* Welcome Section */}
-      <section className="flex flex-col-reverse md:flex-row items-center justify-between flex-1 px-6 py-3 md:px-20 ">
+      <section className="flex flex-col-reverse md:flex-row items-center justify-between flex-1 px-6 py-3 md:px-20">
         {/* Text Content */}
         <div className="flex flex-col gap-6 max-w-lg">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-800">
