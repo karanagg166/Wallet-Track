@@ -60,7 +60,7 @@ export default function Home() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch("/api/charts/expense/normal/years", {
+        const res = await fetch("/api/charts/incomes/normal/months", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
