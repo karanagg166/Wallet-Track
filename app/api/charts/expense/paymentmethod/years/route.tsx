@@ -11,13 +11,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Not authorized" }, { status: 401 });
     }
 
-    let body = {};
-    try {
-      body = await req.json();
-    } catch {
-      // allow no body
-    }
-
+    let body = await req.json();
     const { date1, date2 } = body as { date1?: string; date2?: string };
 
     const fromDate = date1 ? new Date(date1) : null;
@@ -42,25 +36,26 @@ export async function POST(req: Request) {
       },
     });
 
-    // Grouping by date and payment method
-    const groupedByDate: Record<string, Record<string, number>> = {};
+    // Grouping by month and payment method
+    const groupedByMonth: Record<string, Record<string, number>> = {};
 
     for (const exp of expenses) {
-      const dateKey = exp.expenseAt.toISOString().split("T")[0];
+      const date = exp.expenseAt;
+      const yearKey =  `${date.getFullYear()}`;
       const method = exp.paymentmethod ?? "Unknown";
       const amt = exp.amount;
 
-      if (!groupedByDate[dateKey]) groupedByDate[dateKey] = {};
-      if (!groupedByDate[dateKey][method]) groupedByDate[dateKey][method] = 0;
+      if (!groupedByMonth[yearKey]) groupedByMonth[yearKey] = {};
+      if (!groupedByMonth[yearKey][method]) groupedByMonth[yearKey][method] = 0;
 
-      groupedByDate[dateKey][method] += amt;
+      groupedByMonth[yearKey][method] += amt;
     }
 
     // Format for chart
-    const chartData = Object.entries(groupedByDate).map(([date, methods]) => {
+    const chartData = Object.entries(groupedByMonth).map(([month, methods]) => {
       const total = Object.values(methods).reduce((sum, val) => sum + val, 0);
       return {
-        name: date,
+        name: month,
         title: "Payment Methods",
         ...methods,
         total,
@@ -68,7 +63,7 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json({
-      message: "Chart data generated",
+      message: "Monthly chart data generated",
       data: chartData,
     }, { status: 200 });
 
