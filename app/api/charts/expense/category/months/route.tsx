@@ -34,42 +34,43 @@ export async function POST(req: Request) {
       if (fromDate) filters.expenseAt.gte = fromDate;
       if (toDate) filters.expenseAt.lte = toDate;
     }
-
+    
     // ✅ Fetch expenses with category name (may be null)
-   const expenses = await prisma.expense.findMany({
-  where: filters,
-  select: {
-    expenseAt: true,
-    amount: true,
-    category: {
-      select: {
-        name: true,
-      },
-    },
-  },
-});
+    const expenses = await prisma.expense.findMany({
+        where: filters,
+        select: {
+            expenseAt: true,
+            amount: true,
+            category: {
+                select: {
+                    name: true,
+                },
+            },
+        },
+    });
+    
+    
+    // ✅ Group by Month and category name
+    
 
-
-
-    // ✅ Group by date and category name
-    const groupedByDate: Record<string, Record<string, number>> = {};
-
+ const groupByMonth: Record<string, Record<string, number>> = {};
     for (const exp of expenses) {
-      const dateKey = exp.expenseAt.toISOString().split("T")[0];
+        const date = exp.expenseAt;
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
       const categoryName = exp.category?.name ?? "Uncategorized";
       const amt = exp.amount;
 
-      if (!groupedByDate[dateKey]) groupedByDate[dateKey] = {};
-      if (!groupedByDate[dateKey][categoryName]) groupedByDate[dateKey][categoryName] = 0;
-
-      groupedByDate[dateKey][categoryName] += amt;
+      if (!groupByMonth[monthKey]) groupByMonth[monthKey] = {};
+      if (!groupByMonth[monthKey][categoryName]) groupByMonth[monthKey][categoryName] = 0;
+      
+      groupByMonth[monthKey][categoryName] += amt;
     }
-
-    // ✅ Format final chart data
-    const chartData = Object.entries(groupedByDate).map(([date, categories]) => {
-      const total = Object.values(categories).reduce((sum, val) => sum + val, 0);
+    
+    const chartData = Object.entries(groupByMonth).map(([month, categories]) => {
+        // ✅ Format final chart data
+        const total = Object.values(categories).reduce((sum, val) => sum + val, 0);
       return {
-        name: date,            // x-axis label
+        name: month,            // x-axis label
         title: "Expense Categories",
         ...categories,         // category-wise bars
         total,                 // optional: total bar height
