@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import {
+  PieChart,
   LineChart,
   Line,
   XAxis,
@@ -11,6 +12,12 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import GroupedBarChart from '@/components/charts/barcharts/both'
+
+
+import OverviewLineChart from "@/components/charts/linecharts/overviewLineChart";
+import DonutChart from "@/components/charts/donutcharts/DonutChart";
+
+
 export default function OverviewPage() {
   const [totalIncome, setTotalIncome] = useState(0);
   const [totalExpenses, setTotalExpenses] = useState(0);
@@ -173,98 +180,27 @@ const chartData = [
       </div>
 
       {/* Chart Section */}
-      <div className="bg-gray-50 p-6 rounded-xl shadow border border-gray-200">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-semibold text-gray-700">
-            Income vs Expense (Last 30 Days)
-          </h2>
 
-          {/* Toggle Buttons */}
-          <div className="flex gap-2">
-            <button
-              onClick={() => setViewMode("expense")}
-              className={`px-3 py-1 rounded-full text-sm ${
-                viewMode === "expense"
-                  ? "bg-red-500 text-white"
-                  : "bg-gray-200 text-gray-700"
-              }`}
-            >
-              Expense
-            </button>
-            <button
-              onClick={() => setViewMode("income")}
-              className={`px-3 py-1 rounded-full text-sm ${
-                viewMode === "income"
-                  ? "bg-green-500 text-white"
-                  : "bg-gray-200 text-gray-700"
-              }`}
-            >
-              Income
-            </button>
-            <button
-              onClick={() => setViewMode("both")}
-              className={`px-3 py-1 rounded-full text-sm ${
-                viewMode === "both"
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-200 text-gray-700"
-              }`}
-            >
-              Both
-            </button>
-          </div>
-        </div>
-
-        <div>
-      <h2 className="text-lg font-bold mb-4">Monthly Comparison</h2>
-   <GroupedBarChart
-  data={chartData.map((d) => ({
-    name: new Date(d.date).toLocaleDateString("en-IN", {
-      month: "short",
-      day: "numeric",
-    }),
-    value1: d.income,
-    value2: d.expense,
-  }))}
-/>
-
-
-    </div>
-
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis
-              dataKey="date"
-              tickFormatter={(date) => {
-                const [, month, day] = date.split("-");
-                return `${month}-${day}`;
-              }}
-            />
-            <YAxis />
-            <Tooltip />
-            {viewMode !== "income" && (
-              <Line
-                type="monotone"
-                dataKey="expense"
-                stroke="#ef4444"
-                strokeWidth={2}
-                dot={false}
-                name="Expense"
-              />
-            )}
-            {viewMode !== "expense" && (
-              <Line
-                type="monotone"
-                dataKey="income"
-                stroke="#22c55e"
-                strokeWidth={2}
-                dot={false}
-                name="Income"
-              />
-            )}
-          </LineChart>
-        </ResponsiveContainer>
+       {/* Donut Chart */}
+      <div className="my-8">
+        <DonutChart
+          data={[
+            { name: "Expense", value: totalExpenses },
+            { name: "Income", value: totalIncome },
+          ]}
+          totalLabel="This Year"
+        />
       </div>
+
+
+
+      {/* Line Chart */}
+      <OverviewLineChart
+        data={chartData}
+        viewMode={viewMode}
+        onChangeViewMode={setViewMode}
+      />
+ 
     </div>
   );
 }

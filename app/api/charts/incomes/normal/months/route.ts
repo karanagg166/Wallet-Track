@@ -22,9 +22,9 @@ export async function POST(req: Request) {
     };
 
     if (fromDate || endDate) {
-      filters.expenseAt = {};
-      if (fromDate) filters.expenseAt.gte = fromDate;
-      if (endDate) filters.expenseAt.lte = endDate;
+      filters.incomeAt = {};
+      if (fromDate) filters.incomeAt.gte = fromDate;
+      if (endDate) filters.incomeAt.lte = endDate;
     }
 
     const incomes = await prisma.income.findMany({
