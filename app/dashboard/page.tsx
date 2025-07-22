@@ -26,14 +26,15 @@ export default function Home() {
           credentials: "include",
         });
         const result = await res.json();
-        const { totalincome, totalexpense } = result.data;
-        const netBalance = totalincome - totalexpense;
+        console.log(result);
+        const { totalIncome, totalExpense } = result.data;
+        const netBalance = totalIncome - totalExpense;
 
     
 
         setSummary({
-          totalIncome: totalincome,
-          totalExpense: totalexpense,
+          totalIncome: totalIncome,
+          totalExpense: totalExpense,
           netBalance,
         });
 
@@ -95,7 +96,7 @@ export default function Home() {
             <div className="bg-green-100 rounded-xl p-4 text-center shadow">
               <p className="text-gray-600">Total Income</p>
               <p className="text-2xl font-bold text-green-700">
-                ₹{summary?.totalIncome.toFixed(2)}
+                ₹{summary?.totalIncome}
               </p>
             </div>
 
@@ -103,7 +104,7 @@ export default function Home() {
             <div className="bg-red-100 rounded-xl p-4 text-center shadow">
               <p className="text-gray-600">Total Expenses</p>
               <p className="text-2xl font-bold text-red-700">
-                ₹{summary?.totalExpense.toFixed(2)}
+                ₹{summary?.totalExpense}
               </p>
             </div>
 
