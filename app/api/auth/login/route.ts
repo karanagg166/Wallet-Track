@@ -1,70 +1,83 @@
 // app/api/login/route.ts
+
 import { PrismaClient } from '@prisma/client';
 import { compare } from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { NextResponse } from 'next/server';
+
 import { setUserCookies } from '@/lib/cookies/setUserCookies';
 import { getTokenFromCookie } from '@/lib/cookies/CookieUtils';
 import { deleteUserCookies } from '@/lib/cookies/deleteUserCookies';
+
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET!;
 
+/**
+ * POST /api/login
+ * Authenticates a user and sets a JWT in cookies
+ */
 export async function POST(req: Request) {
   try {
     const { email, password } = await req.json();
 
+    // Validate input
     if (!email || !password) {
-      return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
+      return NextResponse.json({ error: 'Missing email or password' }, { status: 400 });
     }
 
-    const existingUser = await prisma.user.findUnique({ where: { email } });
+    // Find user by email
+    const user = await prisma.user.findUnique({ where: { email } });
 
-    if (!existingUser) {
+    if (!user) {
       return NextResponse.json({ error: 'User does not exist' }, { status: 409 });
     }
 
-    const isPasswordCorrect = await compare(password, existingUser.password);
-    if (!isPasswordCorrect) {
-      return NextResponse.json({ error: 'Wrong password' }, { status: 401 });
+    // Check password
+    const isValidPassword = await compare(password, user.password);
+    if (!isValidPassword) {
+      return NextResponse.json({ error: 'Invalid password' }, { status: 401 });
     }
 
+    // Generate JWT
     const token = jwt.sign(
-      { id: existingUser.id, email: existingUser.email },
+      { id: user.id, email: user.email },
       JWT_SECRET,
       { expiresIn: '3h' }
     );
 
-    // ✅ Create response first
+    // Send response and attach cookies
     const response = NextResponse.json({ message: 'Login successful' });
 
-    // ✅ Set cookies into that response
     return setUserCookies(response, {
-      id: existingUser.id,
-      name: existingUser.name,
-      email: existingUser.email,
+      id: user.id,
+      name: user.name,
+      email: user.email,
       token,
     });
-  } catch (err) {
-    console.error('Login error:', err);
+
+  } catch (error) {
+    console.error('Login error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
-export async function DELETE(req:Request){
 
-try {
-const token=getTokenFromCookie();
-if(!token){
-    return NextResponse.json({ error: 'User not logged in' }, { status: 404 });
-}
-const response = NextResponse.json({ message: 'Logout Sucessfully' });
-return deleteUserCookies(response);
+/**
+ * DELETE /api/login
+ * Logs the user out by clearing cookies
+ */
+export async function DELETE(_req: Request) {
+  try {
+    const token = getTokenFromCookie();
 
+    if (!token) {
+      return NextResponse.json({ error: 'User not logged in' }, { status: 404 });
+    }
 
-}
-catch(err){
- console.error('Login error:', err);
+    const response = NextResponse.json({ message: 'Logout successful' });
+    return deleteUserCookies(response);
+
+  } catch (error) {
+    console.error('Logout error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
-
-}
-
+  }
 }

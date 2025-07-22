@@ -1,12 +1,17 @@
-import {NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { getUserFromCookie } from '@/lib/cookies/CookieUtils';
 
 const prisma = new PrismaClient();
+
+/**
+ * GET /api/category
+ * Retrieves all categories for the authenticated user
+ */
 export async function GET(req: Request) {
   try {
     const user = await getUserFromCookie();
-    if (!user || !user.id) {
+    if (!user?.id) {
       return NextResponse.json({ error: "Not authorized" }, { status: 401 });
     }
 
@@ -15,66 +20,73 @@ export async function GET(req: Request) {
     });
 
     return NextResponse.json({ message: "All categories", data: categories }, { status: 200 });
-
   } catch (err) {
     console.error("Error fetching categories:", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
+/**
+ * POST /api/category
+ * Creates a new category if it doesn't already exist for the user
+ */
 export async function POST(req: Request) {
   try {
     const user = await getUserFromCookie();
-    if (!user || !user.id) {
+    if (!user?.id) {
       return NextResponse.json({ error: "Not authorized" }, { status: 401 });
     }
 
     const { name } = await req.json();
 
-    const existingCategory = await prisma.category.findMany({
+    // Check for duplicate category name
+    const existing = await prisma.category.findFirst({
       where: {
         userId: user.id,
         name,
       },
     });
-     console.log(existingCategory);
-    if (existingCategory.length>0) {
+
+    if (existing) {
       return NextResponse.json({ message: "This category already exists" }, { status: 409 });
     }
 
-    const newCategory = await prisma.category.create({
+    // Create new category
+    const category = await prisma.category.create({
       data: {
         userId: user.id,
         name,
       },
     });
 
-    return NextResponse.json({ message: "New category added", data: newCategory }, { status: 200 });
+    return NextResponse.json({ message: "New category added", data: category }, { status: 200 });
   } catch (err) {
     console.error("Error creating category:", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 
-
-
+/**
+ * DELETE /api/category
+ * Deletes a category by ID if it belongs to the authenticated user
+ */
 export async function DELETE(req: Request) {
   try {
     const user = await getUserFromCookie();
-    if (!user || !user.id) {
+    if (!user?.id) {
       return NextResponse.json({ error: "Not authorized" }, { status: 401 });
     }
 
     const { categoryId } = await req.json();
 
-    const deleted = await prisma.category.deleteMany({
+    const deletion = await prisma.category.deleteMany({
       where: {
         id: categoryId,
-        userId: user.id, // ensure user is deleting their own category
+        userId: user.id, // Ensure ownership
       },
     });
 
-    if (deleted.count === 0) {
+    if (deletion.count === 0) {
       return NextResponse.json({ message: "Category not found" }, { status: 404 });
     }
 

@@ -6,55 +6,63 @@ const prisma = new PrismaClient();
 
 export async function POST(req: Request) {
   try {
+    // ✅ Authenticate user
     const user = await getUserFromCookie();
     if (!user || !user.id) {
       return NextResponse.json({ error: "Not Authorized" }, { status: 401 });
     }
 
+    // ✅ Parse optional date range from body
     const body = await req.json();
     const { date1, date2 } = body as { date1?: string; date2?: string };
 
     const fromDate = date1 ? new Date(date1) : null;
     const endDate = date2 ? new Date(date2) : null;
 
+    // ✅ Set up filters
     const filters: any = {
       userId: user.id,
     };
 
     if (fromDate || endDate) {
-      filters.expenseAt = {};
-      if (fromDate) filters.expenseAt.gte = fromDate;
-      if (endDate) filters.expenseAt.lte = endDate;
+      filters.incomeAt = {};
+      if (fromDate) filters.incomeAt.gte = fromDate;
+      if (endDate) filters.incomeAt.lte = endDate;
     }
 
-    const expenses = await prisma.expense.findMany({
+    // ✅ Fetch income records with date and amount
+    const incomes = await prisma.income.findMany({
       where: filters,
       select: {
-        expenseAt: true,
+        incomeAt: true,
         amount: true,
       },
     });
 
-    const groupedByDate: Record<string, number> = {};
+    // ✅ Group income by year (YYYY)
+    const groupedByYear: Record<string, number> = {};
 
-    for (const exp of expenses) {
-     
-     const date = exp.expenseAt;
-      const yearKey =  `${date.getFullYear()}`; 
-      if (!groupedByDate[yearKey]) groupedByDate[yearKey] = 0;
-      groupedByDate[yearKey] += exp.amount;
+    for (const income of incomes) {
+      const date = income.incomeAt;
+      const yearKey = `${date.getFullYear()}`; // e.g., "2025"
+
+      if (!groupedByYear[yearKey]) groupedByYear[yearKey] = 0;
+      groupedByYear[yearKey] += income.amount;
     }
 
-    // Convert to array format if needed for charts
-    const chartData = Object.entries(groupedByDate).map(([year, total]) => ({
+    // ✅ Format for chart
+    const chartData = Object.entries(groupedByYear).map(([year, total]) => ({
       year,
       total,
     }));
 
-    return NextResponse.json({ message: "Summed by Year", data: chartData }, { status: 200 });
+    return NextResponse.json(
+      { message: "Income summed by year", data: chartData },
+      { status: 200 }
+    );
 
   } catch (err) {
-    console.error("Error:", err);
+    console.error("Error fetching yearly income:", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

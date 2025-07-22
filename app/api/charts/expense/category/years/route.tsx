@@ -6,25 +6,26 @@ const prisma = new PrismaClient();
 
 export async function POST(req: Request) {
   try {
+    // ✅ Authenticate user
     const user = await getUserFromCookie();
-
     if (!user || !user.id) {
       return NextResponse.json({ error: "Not authorized" }, { status: 401 });
     }
 
+    // ✅ Safely parse optional body
     let body = {};
     try {
       body = await req.json();
     } catch {
-      // no body is fine
+      // No body is fine — request all-time data
     }
 
     const { date1, date2 } = body as { date1?: string; date2?: string };
 
+    // ✅ Build date range filters
     const fromDate = date1 ? new Date(date1) : null;
     const toDate = date2 ? new Date(date2) : null;
 
-    // ✅ Filters
     const filters: any = {
       userId: user.id,
     };
@@ -34,53 +35,49 @@ export async function POST(req: Request) {
       if (fromDate) filters.expenseAt.gte = fromDate;
       if (toDate) filters.expenseAt.lte = toDate;
     }
-    
-    // ✅ Fetch expenses with category name (may be null)
-    const expenses = await prisma.expense.findMany({
-        where: filters,
-        select: {
-            expenseAt: true,
-            amount: true,
-            category: {
-                select: {
-                    name: true,
-                },
-            },
-        },
-    });
-    
-    
-    // ✅ Group by Month and category name
-        
 
- const groupByMonth: Record<string, Record<string, number>> = {};
+    // ✅ Fetch expenses with category info
+    const expenses = await prisma.expense.findMany({
+      where: filters,
+      select: {
+        expenseAt: true,
+        amount: true,
+        category: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
+
+    // ✅ Group expenses by year and category
+    const groupByYear: Record<string, Record<string, number>> = {};
+
     for (const exp of expenses) {
-        const date = exp.expenseAt;
-      const yearKey = `${date.getFullYear()}`;
-;
+      const yearKey = `${exp.expenseAt.getFullYear()}`;
       const categoryName = exp.category?.name ?? "Uncategorized";
       const amt = exp.amount;
 
-      if (!groupByMonth[yearKey]) groupByMonth[yearKey] = {};
-      if (!groupByMonth[yearKey][categoryName]) groupByMonth[yearKey][categoryName] = 0;
-      
-      groupByMonth[yearKey][categoryName] += amt;
+      if (!groupByYear[yearKey]) groupByYear[yearKey] = {};
+      if (!groupByYear[yearKey][categoryName]) groupByYear[yearKey][categoryName] = 0;
+
+      groupByYear[yearKey][categoryName] += amt;
     }
-    
-    const chartData = Object.entries(groupByMonth).map(([month, categories]) => {
-        // ✅ Format final chart data
-        const total = Object.values(categories).reduce((sum, val) => sum + val, 0);
+
+    // ✅ Format final chart data
+    const chartData = Object.entries(groupByYear).map(([year, categories]) => {
+      const total = Object.values(categories).reduce((sum, val) => sum + val, 0);
       return {
-        name: month,            // x-axis label
+        name: year,              // x-axis label
         title: "Expense Categories",
-        ...categories,         // category-wise bars
-        total,                 // optional: total bar height
+        ...categories,           // category-wise bars
+        total,                   // optional total value
       };
     });
 
     return NextResponse.json(
       {
-        message: "Chart data generated",
+        message: "Yearly chart data generated",
         data: chartData,
       },
       { status: 200 }
