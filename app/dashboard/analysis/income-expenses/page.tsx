@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import GroupedBarChart from "@/components/charts/barcharts/GroupedBarChart";
 import DonutChart from "@/components/charts/donutcharts/DonutChart";
+import IncomeExpenseLineChart from "@/components/charts/linecharts/incomeexpenselinechart";
 
 type ViewMode = "income" | "expense" | "both";
 type Interval = "lastMonth" | "lastYear" | "last5Years";
@@ -14,6 +15,8 @@ export default function IncomeExpensePage() {
     { label: string; income: number; expense: number }[]
   >([]);
 
+  const [incomeSeries, setIncomeSeries] = useState<{ date: string; total: number }[]>([]);
+  const [expenseSeries, setExpenseSeries] = useState<{ date: string; total: number }[]>([]);
   useEffect(() => {
     const fetchChartData = async () => {
       try {
@@ -70,8 +73,29 @@ export default function IncomeExpensePage() {
         const expenseData = await expenseRes.json();
         const incomeData = await incomeRes.json();
 
+        console.log(expenseData);
+        console.log(incomeData);
+
+
+
+
         const expenseItems = expenseData?.data || [];
         const incomeItems = incomeData?.data || [];
+
+
+        // 🔥 Prepare line chart series data
+        const incomeSeriesData = incomeItems.map((i: any) => ({
+          date: i.date || i.day || i.month || i.year,
+          total: i.total,
+        }));
+
+        const expenseSeriesData = expenseItems.map((e: any) => ({
+          date: e.date || e.day || e.month || e.year,
+          total: e.total,
+        }));
+
+        setIncomeSeries(incomeSeriesData);
+        setExpenseSeries(expenseSeriesData);
 
         // 🔥 Merge datasets by label (day/month/year)
         const map: Record<string, { label: string; income: number; expense: number }> = {};
@@ -111,6 +135,8 @@ export default function IncomeExpensePage() {
     };
 
     fetchChartData();
+    console.log("chartData", chartData);
+
   }, [viewMode, interval]);
 
   // Total income and expense for donut chart
@@ -126,28 +152,7 @@ export default function IncomeExpensePage() {
       {/* Controls */}
       <div className="flex flex-wrap gap-4 mb-6">
         {/* View Mode Toggle */}
-        <div className="flex gap-2">
-          {(["income", "expense", "both"] as ViewMode[]).map((mode) => (
-            <button
-              key={mode}
-              onClick={() => setViewMode(mode)}
-              className={`px-3 py-1 rounded-full text-sm ${
-                viewMode === mode
-                  ? `${
-                      mode === "income"
-                        ? "bg-green-500 text-white"
-                        : mode === "expense"
-                        ? "bg-red-500 text-white"
-                        : "bg-blue-500 text-white"
-                    }`
-                  : "bg-gray-200 text-gray-700"
-              }`}
-            >
-              {mode.charAt(0).toUpperCase() + mode.slice(1)}
-            </button>
-          ))}
-        </div>
-
+        
         {/* Interval Selector */}
         <div className="flex gap-2">
           {(["lastMonth", "lastYear", "last5Years"] as Interval[]).map((intv) => (
@@ -170,7 +175,7 @@ export default function IncomeExpensePage() {
         </div>
       </div>
 
-      {/* Charts */}
+      {/* Bar/Donut Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Bar Chart */}
         <div className="bg-white p-4 rounded-xl shadow border">
@@ -188,6 +193,18 @@ export default function IncomeExpensePage() {
             ]}
           />
         </div>
+      </div>
+
+      <div>
+        {/* Line Chart */}
+        <div className="bg-white p-4 rounded-xl shadow border mt-6">
+          <h2 className="text-xl font-semibold mb-2">
+            Income & Expense Trends
+          </h2>
+          
+          <IncomeExpenseLineChart incomeData={incomeSeries} expenseData={expenseSeries} />
+        </div>
+
       </div>
     </div>
   );
