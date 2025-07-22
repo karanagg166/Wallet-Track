@@ -10,6 +10,9 @@ const prisma = new PrismaClient();
  */
 export async function POST(req: Request) {
   try {
+
+    console.log(req);
+    
     const user = await getUserFromCookie();
 
     if (!user?.id) {
@@ -22,6 +25,18 @@ export async function POST(req: Request) {
     const expenseAt = new Date(`${date}T${time}`);
 
     // Create new expense record
+
+    const dataT = {
+        amount,
+        title,
+        categoryId: category,
+        paymentmethod,
+        expenseAt,
+        userId: user.id,
+      };
+
+    //console.log(dataT);
+
     const expense = await prisma.expense.create({
       data: {
         amount,
