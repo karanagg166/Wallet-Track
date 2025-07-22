@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 import clsx from "clsx";
 import { useRouter } from "next/navigation";
+import { CreditCard, Calendar, Clock, Tag, Layers, DollarSign } from "lucide-react";
 
 const schema = z.object({
   amount: z.number().min(1, "Amount must be at least 1"),
@@ -68,20 +69,32 @@ const IncomeForm: React.FC = () => {
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-800 via-indigo-900 to-black p-4"
+      className="min-h-screen flex items-center justify-center"
+      style={{ background: 'radial-gradient(ellipse at 20% 30%, #0f172a 60%, #1e293b 100%)' }}
     >
-      <div className="backdrop-blur-md bg-white/10 border border-white/20 rounded-2xl p-8 w-full max-w-xl shadow-2xl">
-        <h2 className="text-3xl font-bold text-white mb-6 text-center">Add New Expense</h2>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.97 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.6, delay: 0.1 }}
+        whileHover={{ scale: 1.03, boxShadow: '0 0 0 2px #22c55e, 0 8px 40px #0008' }}
+        className="backdrop-blur-xl bg-white/10 border border-[#232b45] rounded-3xl p-10 w-full max-w-2xl shadow-2xl relative"
+        style={{ boxShadow: "0 8px 40px #0008" }}
+      >
+        <div className="flex items-center justify-center gap-3 mb-8">
+          <DollarSign size={32} className="text-[#38bdf8] drop-shadow" />
+          <h2 className="text-3xl font-extrabold text-[#e0e7ef] text-center tracking-wide">Add New Income</h2>
+        </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           {/* Title */}
-          <div>
+          <div className="relative">
+            <Tag size={18} className="absolute left-3 top-3 text-[#6366f1] opacity-80" />
             <input
               {...register("title")}
               placeholder="Title"
               className={clsx(
-                "w-full px-4 py-2 rounded-xl bg-white/10 text-white placeholder-white/60 outline-none focus:ring-2 focus:ring-purple-400 transition-all",
-                errors.title && "border border-red-400"
+                "w-full pl-10 pr-4 py-3 rounded-xl bg-white/10 text-[#e0e7ef] placeholder-[#94a3b8] outline-none focus:ring-2 focus:ring-[#38bdf8] border border-transparent focus:border-[#38bdf8] transition-all text-lg",
+                errors.title && "border border-red-400 focus:border-red-400 focus:ring-red-400"
               )}
             />
             {errors.title && (
@@ -90,14 +103,15 @@ const IncomeForm: React.FC = () => {
           </div>
 
           {/* Amount */}
-          <div>
+          <div className="relative">
+            <CreditCard size={18} className="absolute left-3 top-3 text-[#38bdf8] opacity-80" />
             <input
               type="number"
               {...register("amount", { valueAsNumber: true })}
               placeholder="Amount"
               className={clsx(
-                "w-full px-4 py-2 rounded-xl bg-white/10 text-white placeholder-white/60 outline-none focus:ring-2 focus:ring-purple-400 transition-all",
-                errors.amount && "border border-red-400"
+                "w-full pl-10 pr-4 py-3 rounded-xl bg-white/10 text-[#e0e7ef] placeholder-[#94a3b8] outline-none focus:ring-2 focus:ring-[#38bdf8] border border-transparent focus:border-[#38bdf8] transition-all text-lg",
+                errors.amount && "border border-red-400 focus:border-red-400 focus:ring-red-400"
               )}
             />
             {errors.amount && (
@@ -105,63 +119,62 @@ const IncomeForm: React.FC = () => {
             )}
           </div>
 
-        
-         
-         
-
           {/* Date */}
-          <div>
+          <div className="relative">
+            <Calendar size={18} className="absolute left-3 top-3 text-[#38bdf8] opacity-80" />
             <input
               type="date"
               {...register("date")}
               className={clsx(
-                "w-full px-4 py-2 rounded-xl bg-white/10 text-white outline-none focus:ring-2 focus:ring-purple-400 transition-all",
-                errors.date && "border border-red-400"
+                "w-full pl-10 pr-4 py-3 rounded-xl bg-white/10 text-[#e0e7ef] outline-none focus:ring-2 focus:ring-[#38bdf8] border border-transparent focus:border-[#38bdf8] transition-all text-lg",
+                errors.date && "border border-red-400 focus:border-red-400 focus:ring-red-400"
               )}
             />
             {errors.date && (
               <p className="text-red-400 text-sm mt-1">{errors.date.message}</p>
             )}
           </div>
-           {/* Time */}
-                    <div>
-                      <input
-                        type="time"
-                        {...register("time")}
-                        className={clsx(
-                          "w-full px-4 py-2 rounded-xl bg-white/10 text-white outline-none focus:ring-2 focus:ring-purple-400 transition-all",
-                          errors.time && "border border-red-400"
-                        )}
-                      />
-                      {errors.time && (
-                        <p className="text-red-400 text-sm mt-1">{errors.time.message}</p>
-                      )}
-                    </div>
-           <div>
-                      <input
-                        {...register("incomesource")}
-                        placeholder="Income Source"
-                        className={clsx(
-                          "w-full px-4 py-2 rounded-xl bg-white/10 text-white placeholder-white/60 outline-none focus:ring-2 focus:ring-purple-400 transition-all",
-                          errors.incomesource && "border border-red-400"
-                        )}
-                      />
-                      {errors.incomesource && (
-                        <p className="text-red-400 text-sm mt-1">{errors.incomesource.message}</p>
-                      )}
-                    </div>
+          {/* Time */}
+          <div className="relative">
+            <Clock size={18} className="absolute left-3 top-3 text-[#6366f1] opacity-80" />
+            <input
+              type="time"
+              {...register("time")}
+              className={clsx(
+                "w-full pl-10 pr-4 py-3 rounded-xl bg-white/10 text-[#e0e7ef] outline-none focus:ring-2 focus:ring-[#6366f1] border border-transparent focus:border-[#6366f1] transition-all text-lg",
+                errors.time && "border border-red-400 focus:border-red-400 focus:ring-red-400"
+              )}
+            />
+            {errors.time && (
+              <p className="text-red-400 text-sm mt-1">{errors.time.message}</p>
+            )}
+          </div>
+          {/* Income Source */}
+          <div className="relative">
+            <Layers size={18} className="absolute left-3 top-3 text-[#38bdf8] opacity-80" />
+            <input
+              {...register("incomesource")}
+              placeholder="Income Source"
+              className={clsx(
+                "w-full pl-10 pr-4 py-3 rounded-xl bg-white/10 text-[#e0e7ef] placeholder-[#94a3b8] outline-none focus:ring-2 focus:ring-[#38bdf8] border border-transparent focus:border-[#38bdf8] transition-all text-lg",
+                errors.incomesource && "border border-red-400 focus:border-red-400 focus:ring-red-400"
+              )}
+            />
+            {errors.incomesource && (
+              <p className="text-red-400 text-sm mt-1">{errors.incomesource.message}</p>
+            )}
+          </div>
 
-         
           <motion.button
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ scale: 1.08, boxShadow: "0 0 24px #38bdf8, 0 0 8px #fff2" }}
             whileTap={{ scale: 0.95 }}
             type="submit"
-            className="w-full py-3 mt-4 text-lg font-semibold bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 text-white rounded-xl shadow-xl hover:shadow-2xl transition-all"
+            className="w-full py-3 mt-4 text-lg font-bold bg-[#38bdf8] text-white rounded-xl shadow-xl hover:shadow-2xl transition-all"
           >
-            Submit Expense
+            Submit Income
           </motion.button>
         </form>
-      </div>
+      </motion.div>
     </motion.div>
   );
 };

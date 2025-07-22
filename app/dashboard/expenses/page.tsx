@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import useAddCategory from "@/hooks/category/useAddCategory";
 import useDeleteCategory from "@/hooks/category/useDeleteCategory";
 import useFetchCategories from "@/hooks/category/useFetchCategories";
+import { CreditCard, Calendar, Clock, Tag, Layers, PlusCircle, Trash2 } from "lucide-react";
 
 type Category = {
   id: string;
@@ -96,41 +97,55 @@ const ExpenseForm: React.FC = () => {
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-800 via-indigo-900 to-black p-4"
+      className="min-h-screen flex items-center justify-center"
+      style={{ background: 'radial-gradient(ellipse at 20% 30%, #0f172a 60%, #1e293b 100%)' }}
     >
-      <div className="backdrop-blur-md bg-white/10 border border-white/20 rounded-2xl p-8 w-full max-w-xl shadow-2xl">
-        <h2 className="text-3xl font-bold text-white mb-6 text-center">Add New Expense</h2>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.97 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.6, delay: 0.1 }}
+        whileHover={{ scale: 1.03, boxShadow: '0 0 0 2px #38bdf8, 0 8px 40px #0008' }}
+        className="backdrop-blur-xl bg-white/10 border border-[#232b45] rounded-3xl p-10 w-full max-w-2xl shadow-2xl relative"
+        style={{ boxShadow: "0 8px 40px #0008" }}
+      >
+        <div className="flex items-center justify-center gap-3 mb-8">
+          <Layers size={32} className="text-[#38bdf8] drop-shadow" />
+          <h2 className="text-3xl font-extrabold text-[#e0e7ef] text-center tracking-wide">Add New Expense</h2>
+        </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           {/* Title */}
-          <div>
+          <div className="relative">
+            <Tag size={18} className="absolute left-3 top-3 text-[#6366f1] opacity-80" />
             <input
               {...register("title")}
               placeholder="Title"
               className={clsx(
-                "w-full px-4 py-2 rounded-xl bg-white/10 text-white placeholder-white/60 outline-none focus:ring-2 focus:ring-purple-400 transition-all",
-                errors.title && "border border-red-400"
+                "w-full pl-10 pr-4 py-3 rounded-xl bg-white/10 text-[#e0e7ef] placeholder-[#94a3b8] outline-none focus:ring-2 focus:ring-[#38bdf8] border border-transparent focus:border-[#38bdf8] transition-all text-lg",
+                errors.title && "border border-red-400 focus:border-red-400 focus:ring-red-400"
               )}
             />
             {errors.title && <p className="text-red-400 text-sm mt-1">{errors.title.message}</p>}
           </div>
 
           {/* Amount */}
-          <div>
+          <div className="relative">
+            <CreditCard size={18} className="absolute left-3 top-3 text-[#38bdf8] opacity-80" />
             <input
               type="number"
               {...register("amount", { valueAsNumber: true })}
               placeholder="Amount"
               className={clsx(
-                "w-full px-4 py-2 rounded-xl bg-white/10 text-white placeholder-white/60 outline-none focus:ring-2 focus:ring-purple-400 transition-all",
-                errors.amount && "border border-red-400"
+                "w-full pl-10 pr-4 py-3 rounded-xl bg-white/10 text-[#e0e7ef] placeholder-[#94a3b8] outline-none focus:ring-2 focus:ring-[#38bdf8] border border-transparent focus:border-[#38bdf8] transition-all text-lg",
+                errors.amount && "border border-red-400 focus:border-red-400 focus:ring-red-400"
               )}
             />
             {errors.amount && <p className="text-red-400 text-sm mt-1">{errors.amount.message}</p>}
           </div>
 
           {/* Category */}
-          <div>
+          <div className="relative">
+            <Layers size={18} className="absolute left-3 top-3 text-[#38bdf8] opacity-80" />
             {showNewCategoryInput ? (
               <div className="flex gap-2">
                 <input
@@ -138,7 +153,7 @@ const ExpenseForm: React.FC = () => {
                   placeholder="New category name"
                   value={newCategory}
                   onChange={(e) => setNewCategory(e.target.value)}
-                  className="flex-1 px-4 py-2 rounded-xl bg-white/10 text-white placeholder-white/60 outline-none focus:ring-2 focus:ring-purple-400 transition-all"
+                  className="flex-1 pl-10 pr-4 py-3 rounded-xl bg-white/10 text-[#e0e7ef] placeholder-[#94a3b8] outline-none focus:ring-2 focus:ring-[#38bdf8] border border-transparent focus:border-[#38bdf8] transition-all text-lg"
                 />
                 <button
                   type="button"
@@ -152,7 +167,7 @@ const ExpenseForm: React.FC = () => {
                       }
                     }
                   }}
-                  className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                  className="bg-[#22c55e] text-white px-4 py-2 rounded-full font-bold hover:bg-[#16a34a] transition"
                 >
                   Add
                 </button>
@@ -162,7 +177,7 @@ const ExpenseForm: React.FC = () => {
                     setShowNewCategoryInput(false);
                     setNewCategory("");
                   }}
-                  className="text-white px-3 py-2"
+                  className="text-[#e0e7ef] px-3 py-2 hover:text-red-400 transition"
                 >
                   Cancel
                 </button>
@@ -171,8 +186,8 @@ const ExpenseForm: React.FC = () => {
               <select
                 {...register("category")}
                 className={clsx(
-                  "w-full px-4 py-2 rounded-xl bg-white/10 text-white outline-none focus:ring-2 focus:ring-purple-400 transition-all",
-                  errors.category && "border border-red-400"
+                  "w-full pl-10 pr-4 py-3 rounded-xl bg-white/10 text-[#e0e7ef] outline-none focus:ring-2 focus:ring-[#38bdf8] border border-transparent focus:border-[#38bdf8] transition-all text-lg",
+                  errors.category && "border border-red-400 focus:border-red-400 focus:ring-red-400"
                 )}
                 defaultValue=""
                 onChange={(e) => {
@@ -201,12 +216,13 @@ const ExpenseForm: React.FC = () => {
           </div>
 
           {/* Payment Method */}
-          <div>
+          <div className="relative">
+            <CreditCard size={18} className="absolute left-3 top-3 text-[#6366f1] opacity-80" />
             <select
               {...register("paymentmethod")}
               className={clsx(
-                "w-full px-4 py-2 rounded-xl bg-white/10 text-white outline-none focus:ring-2 focus:ring-purple-400 transition-all",
-                errors.paymentmethod && "border border-red-400"
+                "w-full pl-10 pr-4 py-3 rounded-xl bg-white/10 text-[#e0e7ef] outline-none focus:ring-2 focus:ring-[#6366f1] border border-transparent focus:border-[#6366f1] transition-all text-lg",
+                errors.paymentmethod && "border border-red-400 focus:border-red-400 focus:ring-red-400"
               )}
               defaultValue=""
             >
@@ -226,26 +242,28 @@ const ExpenseForm: React.FC = () => {
           </div>
 
           {/* Date */}
-          <div>
+          <div className="relative">
+            <Calendar size={18} className="absolute left-3 top-3 text-[#38bdf8] opacity-80" />
             <input
               type="date"
               {...register("date")}
               className={clsx(
-                "w-full px-4 py-2 rounded-xl bg-white/10 text-white outline-none focus:ring-2 focus:ring-purple-400 transition-all",
-                errors.date && "border border-red-400"
+                "w-full pl-10 pr-4 py-3 rounded-xl bg-white/10 text-[#e0e7ef] outline-none focus:ring-2 focus:ring-[#38bdf8] border border-transparent focus:border-[#38bdf8] transition-all text-lg",
+                errors.date && "border border-red-400 focus:border-red-400 focus:ring-red-400"
               )}
             />
             {errors.date && <p className="text-red-400 text-sm mt-1">{errors.date.message}</p>}
           </div>
 
           {/* Time */}
-          <div>
+          <div className="relative">
+            <Clock size={18} className="absolute left-3 top-3 text-[#6366f1] opacity-80" />
             <input
               type="time"
               {...register("time")}
               className={clsx(
-                "w-full px-4 py-2 rounded-xl bg-white/10 text-white outline-none focus:ring-2 focus:ring-purple-400 transition-all",
-                errors.time && "border border-red-400"
+                "w-full pl-10 pr-4 py-3 rounded-xl bg-white/10 text-[#e0e7ef] outline-none focus:ring-2 focus:ring-[#6366f1] border border-transparent focus:border-[#6366f1] transition-all text-lg",
+                errors.time && "border border-red-400 focus:border-red-400 focus:ring-red-400"
               )}
             />
             {errors.time && <p className="text-red-400 text-sm mt-1">{errors.time.message}</p>}
@@ -253,28 +271,31 @@ const ExpenseForm: React.FC = () => {
 
           {/* Submit Button */}
           <motion.button
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ scale: 1.08, boxShadow: "0 0 24px #38bdf8, 0 0 8px #fff2" }}
             whileTap={{ scale: 0.95 }}
             type="submit"
-            className="w-full py-3 mt-4 text-lg font-semibold bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 text-white rounded-xl shadow-xl hover:shadow-2xl transition-all"
+            className="w-full py-3 mt-4 text-lg font-bold bg-[#38bdf8] text-white rounded-xl shadow-xl hover:shadow-2xl transition-all"
           >
             Submit Expense
           </motion.button>
         </form>
 
         {/* Category Manager */}
-        <div className="mt-8">
-          <h3 className="text-white text-lg font-semibold mb-2">Manage Categories</h3>
+        <div className="mt-10">
+          <div className="flex items-center gap-2 mb-3">
+            <Layers size={20} className="text-[#38bdf8]" />
+            <h3 className="text-[#e0e7ef] text-lg font-bold">Manage Categories</h3>
+          </div>
           <div className="flex gap-2 mb-4">
             <input
               type="text"
               value={newCategory}
               onChange={(e) => setNewCategory(e.target.value)}
               placeholder="New Category"
-              className="flex-1 px-3 py-2 rounded bg-white/20 placeholder-white/70 text-white"
+              className="flex-1 px-4 py-2 rounded-xl bg-white/10 text-[#e0e7ef] placeholder-[#94a3b8] outline-none focus:ring-2 focus:ring-[#38bdf8] border border-transparent focus:border-[#38bdf8] transition-all"
             />
             <button
-              className="bg-purple-600 px-4 py-2 rounded hover:bg-purple-700 text-white"
+              className="bg-[#6366f1] px-4 py-2 rounded-full font-bold hover:bg-[#4338ca] text-white transition"
               onClick={async () => {
                 if (newCategory.trim()) {
                   await onAddCategory(newCategory.trim());
@@ -282,27 +303,27 @@ const ExpenseForm: React.FC = () => {
                 }
               }}
             >
-              Add
+              <PlusCircle size={18} className="inline-block mr-1" /> Add
             </button>
           </div>
           <ul className="space-y-2">
             {categories.map((cat) => (
               <li
                 key={cat.id}
-                className="flex justify-between items-center bg-white/10 px-3 py-2 rounded text-white"
+                className="flex justify-between items-center bg-white/10 px-4 py-2 rounded-xl text-[#e0e7ef]"
               >
                 <span>{cat.name}</span>
                 <button
                   onClick={() => onDeleteCategory(cat.id)}
-                  className="text-sm text-red-400 hover:underline"
+                  className="flex items-center gap-1 text-sm text-red-400 hover:text-red-300 transition"
                 >
-                  Delete
+                  <Trash2 size={16} /> Delete
                 </button>
               </li>
             ))}
           </ul>
         </div>
-      </div>
+      </motion.div>
     </motion.div>
   );
 };
