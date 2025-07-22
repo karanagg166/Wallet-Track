@@ -1,32 +1,33 @@
 import { PrismaClient } from "@prisma/client";
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/cookies/CookieUtils";
 
 const prisma = new PrismaClient();
 
 export async function POST(req: Request) {
   try {
+    // 🔐 Authenticate user from cookie
     const user = await getUserFromCookie();
     if (!user || !user.id) {
       return NextResponse.json({ error: "Not authorized" }, { status: 401 });
     }
 
-    let body = await req.json();
+    // 📥 Parse request body for optional date filters
+    const body = await req.json();
     const { date1, date2 } = body as { date1?: string; date2?: string };
 
     const fromDate = date1 ? new Date(date1) : null;
     const toDate = date2 ? new Date(date2) : null;
 
-    const filters: any = {
-      userId: user.id,
-    };
-
+    // 📦 Build filters
+    const filters: any = { userId: user.id };
     if (fromDate || toDate) {
       filters.expenseAt = {};
       if (fromDate) filters.expenseAt.gte = fromDate;
       if (toDate) filters.expenseAt.lte = toDate;
     }
 
+    // 📊 Fetch filtered expenses with payment method and date
     const expenses = await prisma.expense.findMany({
       where: filters,
       select: {
@@ -36,34 +37,34 @@ export async function POST(req: Request) {
       },
     });
 
-    // Grouping by month and payment method
-    const groupedByMonth: Record<string, Record<string, number>> = {};
+    // 🧮 Group by year and payment method
+    const groupedByYear: Record<string, Record<string, number>> = {};
 
     for (const exp of expenses) {
-      const date = exp.expenseAt;
-      const yearKey =  `${date.getFullYear()}`;
+      const yearKey = `${exp.expenseAt.getFullYear()}`;
       const method = exp.paymentmethod ?? "Unknown";
       const amt = exp.amount;
 
-      if (!groupedByMonth[yearKey]) groupedByMonth[yearKey] = {};
-      if (!groupedByMonth[yearKey][method]) groupedByMonth[yearKey][method] = 0;
+      if (!groupedByYear[yearKey]) groupedByYear[yearKey] = {};
+      if (!groupedByYear[yearKey][method]) groupedByYear[yearKey][method] = 0;
 
-      groupedByMonth[yearKey][method] += amt;
+      groupedByYear[yearKey][method] += amt;
     }
 
-    // Format for chart
-    const chartData = Object.entries(groupedByMonth).map(([month, methods]) => {
+    // 📈 Format for chart consumption
+    const chartData = Object.entries(groupedByYear).map(([year, methods]) => {
       const total = Object.values(methods).reduce((sum, val) => sum + val, 0);
       return {
-        name: month,
-        title: "Payment Methods",
-        ...methods,
-        total,
+        name: year,                // x-axis label (e.g., 2023)
+        title: "Payment Methods", // for reference in chart UI
+        ...methods,                // dynamic payment methods: Cash, Card, etc.
+        total,                     // total expense for that year
       };
     });
 
+    // ✅ Success response
     return NextResponse.json({
-      message: "Monthly chart data generated",
+      message: "Yearly chart data generated",
       data: chartData,
     }, { status: 200 });
 

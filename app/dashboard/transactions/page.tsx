@@ -31,6 +31,7 @@ export default function TransactionPage() {
 
   useEffect(() => {
     fetchTransactions();
+   
   }, []);
 
   const fetchTransactions = async (filters = {}) => {
@@ -57,6 +58,7 @@ export default function TransactionPage() {
       setLoading(false);
     }
   };
+
 
   const handleFilter = (e: React.FormEvent) => {
     e.preventDefault();

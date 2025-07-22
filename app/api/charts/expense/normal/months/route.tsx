@@ -6,17 +6,20 @@ const prisma = new PrismaClient();
 
 export async function POST(req: Request) {
   try {
+    // ✅ Get the current user from cookies
     const user = await getUserFromCookie();
     if (!user || !user.id) {
       return NextResponse.json({ error: "Not Authorized" }, { status: 401 });
     }
 
+    // ✅ Parse request body for optional date range
     const body = await req.json();
     const { date1, date2 } = body as { date1?: string; date2?: string };
 
     const fromDate = date1 ? new Date(date1) : null;
     const endDate = date2 ? new Date(date2) : null;
 
+    // ✅ Build query filters
     const filters: any = {
       userId: user.id,
     };
@@ -27,6 +30,7 @@ export async function POST(req: Request) {
       if (endDate) filters.expenseAt.lte = endDate;
     }
 
+    // ✅ Fetch all expenses with their dates and amounts
     const expenses = await prisma.expense.findMany({
       where: filters,
       select: {
@@ -35,23 +39,27 @@ export async function POST(req: Request) {
       },
     });
 
-    const groupedByDate: Record<string, number> = {};
+    // ✅ Group amounts by month (YYYY-MM format)
+    const groupedByMonth: Record<string, number> = {};
 
     for (const exp of expenses) {
-     
-     const date = exp.expenseAt;
-      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-      if (!groupedByDate[monthKey]) groupedByDate[monthKey] = 0;
-      groupedByDate[monthKey] += exp.amount;
+      const date = exp.expenseAt;
+      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`; // e.g., "2025-07"
+      
+      if (!groupedByMonth[monthKey]) groupedByMonth[monthKey] = 0;
+      groupedByMonth[monthKey] += exp.amount;
     }
 
-    // Convert to array format if needed for charts
-    const chartData = Object.entries(groupedByDate).map(([month, total]) => ({
-      month,
-      total,
+    // ✅ Convert grouped data into array format (for charts)
+    const chartData = Object.entries(groupedByMonth).map(([month, total]) => ({
+      month,  // x-axis value
+      total,  // y-axis value
     }));
 
-    return NextResponse.json({ message: "Summed by Month", data: chartData }, { status: 200 });
+    return NextResponse.json(
+      { message: "Summed by Month", data: chartData },
+      { status: 200 }
+    );
 
   } catch (err) {
     console.error("Error:", err);

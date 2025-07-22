@@ -2,56 +2,65 @@ import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/cookies/CookieUtils";
 
+// Initialize Prisma client
 const prisma = new PrismaClient();
 
+// POST handler for income grouped by month
 export async function POST(req: Request) {
   try {
+    // Authenticate the user from cookies
     const user = await getUserFromCookie();
     if (!user || !user.id) {
       return NextResponse.json({ error: "Not Authorized" }, { status: 401 });
     }
 
+    // Parse the request body
     const body = await req.json();
     const { date1, date2 } = body as { date1?: string; date2?: string };
 
+    // Convert date strings to Date objects if provided
     const fromDate = date1 ? new Date(date1) : null;
     const endDate = date2 ? new Date(date2) : null;
 
+    // Set up filter for Prisma query
     const filters: any = {
-      userId: user.id,
+      userId: user.id, // Only fetch income for the current user
     };
 
+    // Add optional date filtering on incomeAt field
     if (fromDate || endDate) {
-      filters.expenseAt = {};
-      if (fromDate) filters.expenseAt.gte = fromDate;
-      if (endDate) filters.expenseAt.lte = endDate;
+      filters.incomeAt = {}; // Corrected field name
+      if (fromDate) filters.incomeAt.gte = fromDate;
+      if (endDate) filters.incomeAt.lte = endDate;
     }
 
+    // Query incomes with applied filters
     const incomes = await prisma.income.findMany({
       where: filters,
       select: {
-        incomeAt: true,
-        amount: true,
+        incomeAt: true, // Date the income was received
+        amount: true,   // Income amount
       },
     });
 
-    const groupedByDate: Record<string, number> = {};
+    // Group income amounts by month (YYYY-MM format)
+    const groupedByMonth: Record<string, number> = {};
 
-    for (const exp of incomes) {
-     
-     const date = exp.incomeAt;
+    for (const income of incomes) {
+      const date = income.incomeAt;
       const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-      if (!groupedByDate[monthKey]) groupedByDate[monthKey] = 0;
-      groupedByDate[monthKey] += exp.amount;
+      if (!groupedByMonth[monthKey]) groupedByMonth[monthKey] = 0;
+      groupedByMonth[monthKey] += income.amount;
     }
 
-    // Convert to array format if needed for charts
-    const chartData = Object.entries(groupedByDate).map(([month, total]) => ({
+    // Format grouped data into array format for frontend charts
+    const chartData = Object.entries(groupedByMonth).map(([month, total]) => ({
       month,
       total,
     }));
 
-    return NextResponse.json({ message: "Summed by Month", data: chartData }, { status: 200 });
+    // Return the final grouped monthly income data
+    return NextResponse.json({ message: "Income summed by month", data: chartData }, { status: 200 });
 
   } catch (err) {
     console.error("Error:", err);
