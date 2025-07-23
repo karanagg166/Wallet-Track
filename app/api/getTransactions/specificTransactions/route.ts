@@ -25,7 +25,7 @@ export async function POST(req: Request) {
       date2,
       time1,
       time2,
-      category,
+      categoryId,
       paymentmethod,
       incomesource,
       type
@@ -40,7 +40,7 @@ export async function POST(req: Request) {
      */
     const expenseFilters: any = {
       userId: user.id,
-      ...(category && { category }),
+      ...(categoryId && { categoryId }),
       ...(paymentmethod && { paymentmethod }),
     };
 
