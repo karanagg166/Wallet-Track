@@ -6,6 +6,7 @@ const prisma = new PrismaClient();
 
 export async function POST(req: Request) {
   try {
+
     // ✅ Authenticate user
     const user = await getUserFromCookie();
     if (!user || !user.id) {
@@ -25,16 +26,16 @@ export async function POST(req: Request) {
     };
 
     if (fromDate || endDate) {
-      filters.incomeAt = {};
-      if (fromDate) filters.incomeAt.gte = fromDate;
-      if (endDate) filters.incomeAt.lte = endDate;
+      filters.expenseAt = {};
+      if (fromDate) filters.expenseAt.gte = fromDate;
+      if (endDate) filters.expenseAt.lte = endDate;
     }
 
     // ✅ Fetch income records with date and amount
-    const incomes = await prisma.income.findMany({
+    const incomes = await prisma.expense.findMany({
       where: filters,
       select: {
-        incomeAt: true,
+        expenseAt: true,
         amount: true,
       },
     });
@@ -43,7 +44,7 @@ export async function POST(req: Request) {
     const groupedByYear: Record<string, number> = {};
 
     for (const income of incomes) {
-      const date = income.incomeAt;
+      const date = income.expenseAt;
       const yearKey = `${date.getFullYear()}`; // e.g., "2025"
 
       if (!groupedByYear[yearKey]) groupedByYear[yearKey] = 0;
