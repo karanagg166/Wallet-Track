@@ -1,176 +1,179 @@
-"use client";
+'use client';
+import React, { useEffect, useState } from 'react';
+import DonutChart from '@/components/charts/donutcharts/DonutChart';
+import StackedBarChart from '@/components/charts/barcharts/stacked';
+import EarningsSpendingAreaChart from '@/components/charts/areacharts/EarningsSpendingAreaChart';
 
-import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import {
-    Select,
-    SelectTrigger,
-    SelectValue,
-    SelectContent,
-    SelectItem,
-} from "@/components/ui/select";
-import {
-    PieChart,
-    Pie,
-    Cell,
-    Tooltip,
-    BarChart,
-    Bar,
-    XAxis,
-    YAxis,
-    ResponsiveContainer,
-    Legend,
-    LineChart,
-    Line,
-} from "recharts";
+type EarningsSpendingData = {
+  name: string;
+  title: string;
+  total: number;
+  Array: { name: string; value: number }[];
+};
 
-const COLORS = ["#4f46e5", "#16a34a", "#dc2626", "#f59e0b", "#3b82f6", "#8b5cf6"];
+type AreaData = {
+  date: string;
+  income: number;
+  expense: number;
+  net: number;
+};
 
-export default function CategoryPage() {
-    const [categoryData, setCategoryData] = useState([]);
-    const [categories, setCategories] = useState([]);
-    const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-    const [timeline, setTimeline] = useState("month"); // "month" | "year" | "all"
-    const [lineData, setLineData] = useState([]);
-    const [startDate, setStartDate] = useState("");
-    const [endDate, setEndDate] = useState("");
-    const [breakdown, setBreakdown] = useState("monthly");
-    const [barData, setBarData] = useState([]);
+const EarningsAndSpendingsPage = () => {
+  const [donutData, setDonutData] = useState<EarningsSpendingData[]>([]);
+  const [stackedData, setStackedData] = useState<EarningsSpendingData[]>([]);
+  const [areaData, setAreaData] = useState<AreaData[]>([]);
+  const [loadingDonut, setLoadingDonut] = useState(true);
+  const [loadingStacked, setLoadingStacked] = useState(true);
+  const [loadingArea, setLoadingArea] = useState(true);
+  
+  // Set default start date to 4 months before today
+  const getDefaultStartDate = () => {
+    const today = new Date();
+    const fourMonthsAgo = new Date(today.getFullYear(), today.getMonth() - 4, today.getDate());
+    return fourMonthsAgo.toISOString().split('T')[0];
+  };
+  
+  const [startDate, setStartDate] = useState(getDefaultStartDate());
+  const [endDate, setEndDate] = useState('');
 
-    // Fetch all categories for dropdown
-    const fetchCategories = async () => {
-        try {
-            const res = await fetch("/api/expense/category");
-            const result = await res.json();
-            setCategories(result.data);
-        } catch (error) {
-            console.error("Error fetching categories:", error);
-        }
-    };
+  const fetchDonutData = async () => {
+    setLoadingDonut(true);
+    try {
+      const res = await fetch('/api/charts/earnings-spending', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          date1: startDate || undefined, 
+          date2: endDate || undefined 
+        }),
+      });
+      const json = await res.json();
+      console.log('Earnings & Spending donut data:', json.data);
+      setDonutData(json.data || []);
+    } catch (err) {
+      console.error('Error fetching earnings & spending donut data:', err);
+    } finally {
+      setLoadingDonut(false);
+    }
+  };
 
-    // Fetch category breakdown for donut chart
-    const fetchCategoryData = async () => {
-        try {
-            const res = await fetch("/api/category-breakdown", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ startDate, endDate }),
-            });
-            const result = await res.json();
-            setCategoryData(result.data);
-        } catch (error) {
-            console.error("Error fetching category breakdown:", error);
-        }
-    };
+  const fetchStackedData = async () => {
+    setLoadingStacked(true);
+    try {
+      const res = await fetch('/api/charts/earnings-spending-stacked', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          date1: startDate || undefined, 
+          date2: endDate || undefined 
+        }),
+      });
+      const json = await res.json();
+      console.log('Earnings & Spending stacked data:', json.data);
+      setStackedData(json.data || []);
+    } catch (err) {
+      console.error('Error fetching earnings & spending stacked data:', err);
+    } finally {
+      setLoadingStacked(false);
+    }
+  };
 
-    // Fetch line chart data for selected category and timeline
-    const fetchLineData = async () => {
-        if (!selectedCategory) return;
+  const fetchAreaData = async () => {
+    setLoadingArea(true);
+    try {
+      const res = await fetch('/api/charts/earnings-spending-area', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          date1: startDate || undefined, 
+          date2: endDate || undefined 
+        }),
+      });
+      const json = await res.json();
+      console.log('Earnings & Spending area data:', json.data);
+      setAreaData(json.data || []);
+    } catch (err) {
+      console.error('Error fetching earnings & spending area data:', err);
+    } finally {
+      setLoadingArea(false);
+    }
+  };
 
-        try {
-            const res = await fetch("/api/charts/category-trends", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ categoryId: selectedCategory, timeline }),
-            });
-            const result = await res.json();
-            setLineData(result.data);
-        } catch (error) {
-            console.error("Error fetching line data:", error);
-        }
-    };
+  useEffect(() => {
+    fetchDonutData();
+    fetchStackedData();
+    fetchAreaData();
+  }, [startDate, endDate]);
 
-    useEffect(() => {
-        fetchCategories();
-        fetchCategoryData();
-    }, []);
+  return (
+    <div className="p-6 space-y-6">
+      <h1 className="text-3xl font-bold text-gray-800">Earnings & Spending Analysis</h1>
 
-    useEffect(() => {
-        if (selectedCategory) fetchLineData();
-    }, [selectedCategory, timeline]);
-
-    return (
-        <div className="p-6 space-y-8">
-            {/* Donut Chart */}
-            <div className="bg-white rounded-2xl shadow p-6">
-                <h2 className="text-xl font-semibold text-gray-800 mb-4">
-                    Category Wise Breakdown
-                </h2>
-                <ResponsiveContainer width="100%" height={300}>
-                    <PieChart>
-                        <Pie
-                            data={categoryData}
-                            dataKey="total"
-                            nameKey="category"
-                            cx="50%"
-                            cy="50%"
-                            outerRadius={100}
-                            label
-                        >
-                            {categoryData.map((_, index) => (
-                                <Cell
-                                    key={`cell-${index}`}
-                                    fill={COLORS[index % COLORS.length]}
-                                />
-                            ))}
-                        </Pie>
-                        <Tooltip />
-                        <Legend />
-                    </PieChart>
-                </ResponsiveContainer>
-            </div>
-
-            {/* Category Trends Line Chart */}
-            <div className="bg-white rounded-2xl shadow p-6">
-                <h2 className="text-xl font-semibold text-gray-800 mb-4">
-                    Category Trends
-                </h2>
-                <div className="flex items-center gap-4 mb-4">
-                    {/* Category Selector */}
-                    <Select
-                        value={selectedCategory ?? ""}
-                        onValueChange={setSelectedCategory}
-                    >
-                        <SelectTrigger className="w-60">
-                            <SelectValue placeholder="Select Category" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {categories.map((cat: any) => (
-                                <SelectItem key={cat.id} value={cat.id}>
-                                    {cat.name}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-
-                    {/* Timeline Selector */}
-                    <Select value={timeline} onValueChange={setTimeline}>
-                        <SelectTrigger className="w-40">
-                            <SelectValue placeholder="Timeline" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="month">Past Month</SelectItem>
-                            <SelectItem value="year">Past Year</SelectItem>
-                            <SelectItem value="all">All Time</SelectItem>
-                        </SelectContent>
-                    </Select>
-                </div>
-
-                <ResponsiveContainer width="100%" height={300}>
-                    <LineChart data={lineData}>
-                        <XAxis dataKey="date" />
-                        <YAxis />
-                        <Tooltip />
-                        <Legend />
-                        <Line
-                            type="monotone"
-                            dataKey="amount"
-                            stroke="#4f46e5"
-                            strokeWidth={2}
-                        />
-                    </LineChart>
-                </ResponsiveContainer>
-            </div>
+      {/* Date Filter Section */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-semibold mb-4">Date Range Filter</h2>
+        <div className="flex gap-4 items-end">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Start Date</label>
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">End Date</label>
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
         </div>
-    );
-}
+      </div>
+
+      {/* Donut Chart Section */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-semibold mb-4">Earnings vs Spending Overview</h2>
+        {loadingDonut ? (
+          <div className="flex items-center justify-center h-64">
+            <div className="text-gray-500">Loading...</div>
+          </div>
+        ) : (
+          <DonutChart 
+            data={donutData} 
+            totalLabel={donutData.length > 0 ? `Total: ${donutData[0]?.total?.toLocaleString() || 0}` : "No Data"} 
+          />
+        )}
+      </div>
+
+      {/* Stacked Bar Chart Section */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-semibold mb-4">Daily Earnings & Spending Trend</h2>
+        {loadingStacked ? (
+          <div className="flex items-center justify-center h-64">
+            <div className="text-gray-500">Loading...</div>
+          </div>
+        ) : (
+          <StackedBarChart data={stackedData} />
+        )}
+      </div>
+
+      {/* Area Chart Section */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h2 className="text-xl font-semibold mb-4">Earnings & Spending Trend Analysis</h2>
+        {loadingArea ? (
+          <div className="flex items-center justify-center h-64">
+            <div className="text-gray-500">Loading...</div>
+          </div>
+        ) : (
+          <EarningsSpendingAreaChart data={areaData} />
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default EarningsAndSpendingsPage;

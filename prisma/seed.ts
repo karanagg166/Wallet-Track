@@ -49,14 +49,14 @@ async function main() {
 
 
     // --- Generate Dummy Expenses ---
-    const numberOfExpensesToGenerate = 150; // Adjust as needed
+    const numberOfExpensesToGenerate = 20; // Adjust as needed
     let expensesCreated = 0;
 
     if (expenseCategories.length > 0) {
       console.log(`🚀 Generating ${numberOfExpensesToGenerate} expenses...`);
       for (let i = 0; i < numberOfExpensesToGenerate; i++) {
         const randomCategory = faker.helpers.arrayElement(expenseCategories);
-        const expenseDate = faker.date.recent({ days: 365 * 2 }); // Expenses over the last 2 years (approx)
+        const expenseDate = faker.date.recent({ days: 2 }); // Expenses over the last 2 years (approx)
 
         await prisma.expense.create({
           data: {
