@@ -17,6 +17,7 @@ model User {
   updatedAt DateTime  @updatedAt
   expenses  Expense[] // ✅ No typo here
   incomes   Income[]  // ✅ Fixed typo: changed `incomes.` → `incomes`
+  notifications Notification[]
 }
 
 model Expense {
@@ -52,5 +53,17 @@ model Category {
   expenses  Expense[]
 
   @@unique([userId, name])
+}
+
+model Notification {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  message   String
+  type      String   // "info", "warning", "success", "error"
+  isRead    Boolean  @default(false)
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  link      String?  // Optional link to navigate to
 }
 

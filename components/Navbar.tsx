@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useLogout } from "@/app/utils/logout";
 import { Home, BarChart3, List, Info, LogOut, UserCircle } from "lucide-react";
 import { motion } from "framer-motion";
+import NotificationButton from "./NotificationButton";
 const Navbar = () => {
   const router = useRouter();
 const logout = useLogout();
@@ -84,8 +85,9 @@ const logout = useLogout();
         ))}
       </div>
 
-      {/* Right Section: Avatar + Logout */}
+      {/* Right Section: Notifications + Avatar + Logout */}
       <div className="flex items-center gap-3">
+        <NotificationButton />
         <motion.div
           whileHover={{ scale: 1.13, boxShadow: "0 0 16px #38bdf8" }}
           className="rounded-full bg-[#232b45] p-1 shadow-inner border border-[#232b45] cursor-pointer"

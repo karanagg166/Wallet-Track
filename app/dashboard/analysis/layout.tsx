@@ -14,8 +14,10 @@ import {
 
 const sidebarItems = [
  
+  
+  { name: "spendings and earnings both", href: "/dashboard/analysis/expense", icon: <PieChart size={18} /> },
   { name: "earnings", href: "/dashboard/analysis/income", icon: <PieChart size={18} /> },
-  { name: "spendings", href: "/dashboard/analysis/expense", icon: <PieChart size={18} /> },
+  { name: "spendings", href: "/dashboard/analysis/Earnings_and_Spendings", icon: <PieChart size={18} /> },
 ];
 
 export default function AnalysisLayout({
