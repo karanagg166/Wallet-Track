@@ -62,21 +62,21 @@ export async function POST(req: Request) {
     }
 
     // Format data for chart (array of objects per year with sources)
-   const chartData = Object.entries(groupedByYear).map(([year, sources]) => {
-  const entries = Object.entries(sources);
-  const total = entries.reduce((sum, [, val]) => sum + val, 0);
-
-  return {
-    name: year, // e.g., "2025"
-    title: "Income Source",
-    sources: entries.map(([key, value]) => ({
-      name: key,
-      value: value,
-    })),
-    total,
-  };
-});
-
+    const chartData = Object.entries(groupedByYear).map(([year, sources]) => {
+      const entries = Object.entries(sources);
+      const total = entries.reduce((sum, [, val]) => sum + val, 0);
+    
+      return {
+        name: year, // e.g., "2025"
+        title: "Income Source",
+        Array: entries.map(([key, value]) => ({
+          name: key,
+          value: value,
+        })), // ✅ renamed 'sources' to 'Array'
+        total,
+      };
+    });
+    
     // Return final grouped data
     return NextResponse.json({
       message: "Yearly income grouped by source",

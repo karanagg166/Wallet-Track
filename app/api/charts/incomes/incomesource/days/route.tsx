@@ -58,21 +58,21 @@ export async function POST(req: Request) {
     }
 
     // Format for charting libraries (e.g., Recharts)
-   const chartData = Object.entries(groupedByDate).map(([date, sources]) => {
-  const entries = Object.entries(sources);
-  const total = entries.reduce((sum, [, val]) => sum + val, 0);
-
-  return {
-    name: date, // X-axis label
-    title: "Income Source",
-    sources: entries.map(([key, value]) => ({
-      name: key,
-      value: value,
-    })), // ✅ now stored as array of { name, value }
-    total,
-  };
-});
-
+    const chartData = Object.entries(groupedByDate).map(([date, sources]) => {
+      const entries = Object.entries(sources);
+      const total = entries.reduce((sum, [, val]) => sum + val, 0);
+    
+      return {
+        name: date, // X-axis label
+        title: "Income Source",
+        Array: entries.map(([key, value]) => ({
+          name: key,
+          value: value,
+        })), // ✅ renamed 'sources' to 'Array'
+        total,
+      };
+    });
+    
 
     // Return structured chart data
     return NextResponse.json({
