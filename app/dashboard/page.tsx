@@ -73,7 +73,7 @@ export default function Home() {
           credentials: "include",
         });
         const result = await res.json();
-        console.log(result);
+      //  console.log(result);
         const { totalIncome, totalExpense } = result.data;
         const netBalance = totalIncome - totalExpense;
 
@@ -92,7 +92,7 @@ export default function Home() {
         });
 
         const {userName: name} = await res2.json();
-        console.log(name)
+        //console.log(name)
         setUserName(name);
 
       } catch (err) {
@@ -108,14 +108,14 @@ export default function Home() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch("/api/charts/incomes/incomesource/years", {
+        const res = await fetch("/api/charts/incomes/normal/days", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
           body: JSON.stringify({}),
         });
          const data = await res.json();
-      console.log(data); 
+      console.log("tested data",data); 
 
       } catch (err) {
         console.error("Error fetching summary:", err);

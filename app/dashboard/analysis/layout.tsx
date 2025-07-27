@@ -13,13 +13,9 @@ import {
 } from "lucide-react";
 
 const sidebarItems = [
-  { name: "Overview", href: "/dashboard/analysis", icon: <TrendingUp size={18} /> },
-  { name: "Income & Expenses", href: "/dashboard/analysis/income-expenses", icon: <BarChart3 size={18} /> },
-  { name: "Category Breakdown", href: "/dashboard/analysis/categories", icon: <PieChart size={18} /> },
-  { name: "Trends Over Time", href: "/dashboard/analysis/trends", icon: <LineChart size={18} /> },
-  { name: "Goals & Progress", href: "/dashboard/analysis/goals", icon: <Gauge size={18} /> },
-  { name: "Recurring Expenses", href: "/dashboard/analysis/recurring", icon: <Layers size={18} /> },
-  { name: "Alerts & Reports", href: "/dashboard/analysis/alerts", icon: <Bell size={18} /> },
+ 
+  { name: "incomes", href: "/dashboard/analysis/income", icon: <PieChart size={18} /> },
+ 
 ];
 
 export default function AnalysisLayout({

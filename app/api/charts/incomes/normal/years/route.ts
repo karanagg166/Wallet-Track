@@ -59,8 +59,8 @@ export async function POST(req: Request) {
     }
 
     // Convert the grouped object to an array for charts or frontend use
-    const chartData = Object.entries(groupedByYear).map(([year, total]) => ({
-      year,
+    const chartData = Object.entries(groupedByYear).map(([date, total]) => ({
+      date,
       total,
     }));
 

@@ -54,8 +54,8 @@ export async function POST(req: Request) {
     }
 
     // Format grouped data into array format for frontend charts
-    const chartData = Object.entries(groupedByMonth).map(([month, total]) => ({
-      month,
+    const chartData = Object.entries(groupedByMonth).map(([date, total]) => ({
+      date,
       total,
     }));
 

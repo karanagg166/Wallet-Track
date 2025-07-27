@@ -27,7 +27,7 @@ export async function POST(req: Request) {
     const filters: any = {
       userId: user.id, // Ensure only the current user's income is fetched
     };
-
+  
     // Add optional date range filtering on the incomeAt field
     if (fromDate || endDate) {
       filters.incomeAt = {};
