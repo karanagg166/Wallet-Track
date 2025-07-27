@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useDateContext } from '@/context/DateContext';
-import IncomeBarChart from '@/components/charts/barcharts/income';
+import IncomeBarChart from '@/components/charts/barcharts/barchart';
 
 type IncomeData = {
   date: string;
@@ -11,76 +11,51 @@ type IncomeData = {
 
 const BarChartsPage = () => {
   const { startDate, endDate } = useDateContext();
-  
+
   const [dataDate, setDataDate] = useState<IncomeData[]>([]);
   const [dataMonth, setDataMonth] = useState<IncomeData[]>([]);
   const [dataYear, setDataYear] = useState<IncomeData[]>([]);
-
-  const [loadingDate, setLoadingDate] = useState(true);
-  const [loadingMonth, setLoadingMonth] = useState(true);
-  const [loadingYear, setLoadingYear] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoadingDate(true);
+    const fetchAllData = async () => {
+      setLoading(true);
       try {
-        const res = await fetch('/api/charts/incomes/normal/days', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ date1:startDate, date2:endDate }),
-        });
-        const json = await res.json();
-        setDataDate(json.data);
+        const [dayRes, monthRes, yearRes] = await Promise.all([
+          fetch('/api/charts/incomes/normal/days', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ date1: startDate, date2: endDate }),
+          }),
+          fetch('/api/charts/incomes/normal/months', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ date1: startDate, date2: endDate }),
+          }),
+          fetch('/api/charts/incomes/normal/years', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ date1: startDate, date2: endDate }),
+          }),
+        ]);
+
+        const [dayJson, monthJson, yearJson] = await Promise.all([
+          dayRes.json(),
+          monthRes.json(),
+          yearRes.json(),
+        ]);
+
+        setDataDate(dayJson.data || []);
+        setDataMonth(monthJson.data || []);
+        setDataYear(yearJson.data || []);
       } catch (err) {
-        console.error(err);
+        console.error('Error fetching bar chart data:', err);
       } finally {
-        setLoadingDate(false);
+        setLoading(false);
       }
     };
 
-    fetchData();
-  }, [startDate, endDate]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoadingMonth(true);
-      try {
-        const res = await fetch('/api/charts/incomes/normal/months', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ date1:startDate, date2:endDate }),
-        });
-        const json = await res.json();
-        setDataMonth(json.data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoadingMonth(false);
-      }
-    };
-
-    fetchData();
-  }, [startDate, endDate]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoadingYear(true);
-      try {
-        const res = await fetch('/api/charts/incomes/normal/years', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-           body: JSON.stringify({ date1:startDate, date2:endDate }),
-        });
-        const json = await res.json();
-        setDataYear(json.data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoadingYear(false);
-      }
-    };
-
-    fetchData();
+    fetchAllData();
   }, [startDate, endDate]);
 
   return (
@@ -88,13 +63,13 @@ const BarChartsPage = () => {
       <h1>Income Charts</h1>
 
       <h2>Daily</h2>
-      {loadingDate ? <p>Loading...</p> : <IncomeBarChart data={dataDate} />}
+      {loading ? <p>Loading...</p> : <IncomeBarChart data={dataDate} />}
 
       <h2>Monthly</h2>
-      {loadingMonth ? <p>Loading...</p> : <IncomeBarChart data={dataMonth} />}
+      {loading ? <p>Loading...</p> : <IncomeBarChart data={dataMonth} />}
 
       <h2>Yearly</h2>
-      {loadingYear ? <p>Loading...</p> : <IncomeBarChart data={dataYear} />}
+      {loading ? <p>Loading...</p> : <IncomeBarChart data={dataYear} />}
     </div>
   );
 };

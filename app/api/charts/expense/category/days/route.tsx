@@ -62,15 +62,22 @@ export async function POST(req: Request) {
     }
 
     // ✅ Format data for frontend chart (e.g., Recharts or ApexCharts)
-    const chartData = Object.entries(groupedByDate).map(([date, categories]) => {
-      const total = Object.values(categories).reduce((sum, val) => sum + val, 0);
-      return {
-        name: date,                 // x-axis (date)
-        title: "Expense Categories",// group title (optional)
-        ...categories,              // spread category values (e.g. Food, Travel)
-        total,                      // total per day (for total bar if needed)
-      };
-    });
+   const chartData = Object.entries(groupedByDate).map(([date, categories]) => {
+  const total = Object.values(categories).reduce((sum, val) => sum + val, 0);
+
+  const Array = Object.entries(categories).map(([categoryName, value]) => ({
+    name: categoryName,
+    value,
+  }));
+
+  return {
+    name: date,                  // x-axis (date)
+    title: "Expense Categories", // optional title
+    total,                       // total per day
+    Array,                       // 👈 wrapped categories
+  };
+});
+
 
     // ✅ Return formatted response
     return NextResponse.json(

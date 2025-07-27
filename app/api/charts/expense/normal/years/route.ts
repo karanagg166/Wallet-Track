@@ -53,7 +53,7 @@ export async function POST(req: Request) {
 
     // ✅ Format for chart
     const chartData = Object.entries(groupedByYear).map(([year, total]) => ({
-      year,
+      date:year,
       total,
     }));
 

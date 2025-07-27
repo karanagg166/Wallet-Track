@@ -30,7 +30,7 @@ type IncomeData = {
   name: string;
   title: string;
   total: number;
-  sources: IncomeItem[];
+  Array: IncomeItem[]; // ✅ Using 'Array' as a key (unconventional, but valid)
 };
 
 interface Props {
@@ -50,7 +50,7 @@ const StackedBarChart: React.FC<Props> = ({ data }) => {
   // Collect all unique source names across all entries
   const allSources = Array.from(
     new Set(
-      data.flatMap((item) => item.sources.map((src) => src.name))
+      data.flatMap((item) => item.Array.map((src) => src.name)) // ✅ Use 'Array' here
     )
   );
 
@@ -58,7 +58,7 @@ const StackedBarChart: React.FC<Props> = ({ data }) => {
   const datasets = allSources.map((source, idx) => ({
     label: source,
     data: data.map((item) => {
-      const found = item.sources.find((i) => i.name === source);
+      const found = item.Array.find((i) => i.name === source); // ✅ Use 'Array' here
       return found ? found.value : 0;
     }),
     backgroundColor: COLORS[idx % COLORS.length],

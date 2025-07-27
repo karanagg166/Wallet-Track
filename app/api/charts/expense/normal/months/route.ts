@@ -52,7 +52,7 @@ export async function POST(req: Request) {
 
     // ✅ Convert grouped data into array format (for charts)
     const chartData = Object.entries(groupedByMonth).map(([month, total]) => ({
-      month,  // x-axis value
+      date:month,  // x-axis value
       total,  // y-axis value
     }));
 

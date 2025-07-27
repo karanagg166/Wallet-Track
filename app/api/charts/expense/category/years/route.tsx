@@ -65,15 +65,21 @@ export async function POST(req: Request) {
     }
 
     // ✅ Format final chart data
-    const chartData = Object.entries(groupByYear).map(([year, categories]) => {
-      const total = Object.values(categories).reduce((sum, val) => sum + val, 0);
-      return {
-        name: year,              // x-axis label
-        title: "Expense Categories",
-        ...categories,           // category-wise bars
-        total,                   // optional total value
-      };
-    });
+   const chartData = Object.entries(groupByYear).map(([year, categories]) => {
+  const total = Object.values(categories).reduce((sum, val) => sum + val, 0);
+
+  const Array = Object.entries(categories).map(([categoryName, value]) => ({
+    name: categoryName,
+    value,
+  }));
+
+  return {
+    name: year,                // x-axis label
+    title: "Expense Categories",
+    total,                     // optional total value
+    Array,                     // 👈 wrapped category values
+  };
+});
 
     return NextResponse.json(
       {
