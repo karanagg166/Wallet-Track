@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   PieChart as RePieChart,
@@ -8,44 +8,54 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const COLORS = ["#8884d8", "#82ca9d", "#ffc658", "#ff8042"];
+const COLORS = ["#8884d8", "#82ca9d", "#ffc658", "#ff8042", "#a28cf7", "#ff6699"];
+
+type DonutChartData = {
+  name: string;
+  title: string;
+  total: number;
+  sources: { name: string; value: number }[];
+};
 
 type Props = {
-  data: { name: string; value: number }[];
-  totalLabel?: string; // Optional label in the center
+  data: DonutChartData[];
+  totalLabel?: string;
 };
 
 export default function DonutChart({ data, totalLabel }: Props) {
-  const total = data.reduce((acc, cur) => acc + cur.value, 0);
+  if (!data || data.length === 0 || !data[0].sources) return <p>No data</p>;
+
+  const { sources, total } = data[0];
+
+  const sanitizedSources = sources.map((item) => ({
+    name: item.name,
+    value: isNaN(item.value) ? 0 : item.value,
+  }));
 
   return (
     <ResponsiveContainer width="100%" height={300}>
       <RePieChart>
         <Pie
-          data={data}
+          data={sanitizedSources}
           dataKey="value"
           nameKey="name"
-          innerRadius={60} // 👈 Creates donut hole
+          innerRadius={60}
           outerRadius={100}
           label
         >
-          {data.map((_, index) => (
-            <Cell
-              key={`cell-${index}`}
-              fill={COLORS[index % COLORS.length]}
-            />
+          {sanitizedSources.map((_, index) => (
+            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
           ))}
         </Pie>
 
-        {/* Center Text */}
         <text
           x="50%"
           y="50%"
           textAnchor="middle"
           dominantBaseline="middle"
-          className="text-xl font-semibold"
+          style={{ fontSize: 16, fontWeight: 600 }}
         >
-          {totalLabel ?? total}
+          {totalLabel ?? total.toLocaleString()}
         </text>
 
         <Tooltip />

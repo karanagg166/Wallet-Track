@@ -62,15 +62,20 @@ export async function POST(req: Request) {
     }
 
     // Format data for chart (array of objects per year with sources)
-    const chartData = Object.entries(groupedByYear).map(([year, sources]) => {
-      const total = Object.values(sources).reduce((sum, val) => sum + val, 0);
-      return {
-        name: year,             // X-axis label
-        title: "Income Source", // For labeling/grouping in UI
-        ...sources,             // Spread all income sources
-        total,                  // Total income for the year
-      };
-    });
+   const chartData = Object.entries(groupedByYear).map(([year, sources]) => {
+  const entries = Object.entries(sources);
+  const total = entries.reduce((sum, [, val]) => sum + val, 0);
+
+  return {
+    name: year, // e.g., "2025"
+    title: "Income Source",
+    sources: entries.map(([key, value]) => ({
+      name: key,
+      value: value,
+    })),
+    total,
+  };
+});
 
     // Return final grouped data
     return NextResponse.json({

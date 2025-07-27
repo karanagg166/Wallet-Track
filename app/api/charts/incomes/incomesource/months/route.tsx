@@ -60,15 +60,21 @@ export async function POST(req: Request) {
     }
 
     // Format data for frontend charts (e.g., stacked bar)
-    const chartData = Object.entries(groupedByMonth).map(([month, sources]) => {
-      const total = Object.values(sources).reduce((sum, val) => sum + val, 0);
-      return {
-        name: month,               // For x-axis (e.g., "2025-07")
-        title: "Income Source",    // Chart label
-        ...sources,                // Spread each source: { Cash: 100, Bank: 200 }
-        total,                     // Total income for the month
-      };
-    });
+  const chartData = Object.entries(groupedByMonth).map(([month, sources]) => {
+  const entries = Object.entries(sources);
+  const total = entries.reduce((sum, [, val]) => sum + val, 0);
+
+  return {
+    name: month, // e.g., "2025-07"
+    title: "Income Source",
+    sources: entries.map(([key, value]) => ({
+      name: key,
+      value: value,
+    })), // ✅ store source breakdown as array
+    total,
+  };
+});
+
 
     // Return response
     return NextResponse.json({

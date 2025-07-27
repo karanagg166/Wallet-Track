@@ -47,8 +47,9 @@ export default function TransactionPage() {
       });
 
       if (!res.ok) throw new Error("Failed to fetch transactions");
-
+     
       const json = await res.json();
+      console.log(json.data);
       const normalized = json.data.map((txn: any) => ({
         ...txn,
         type: txn.expenseAt ? "expense" : "income",
