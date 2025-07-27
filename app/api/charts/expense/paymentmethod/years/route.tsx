@@ -52,15 +52,22 @@ export async function POST(req: Request) {
     }
 
     // 📈 Format for chart consumption
-    const chartData = Object.entries(groupedByYear).map(([year, methods]) => {
-      const total = Object.values(methods).reduce((sum, val) => sum + val, 0);
-      return {
-        name: year,                // x-axis label (e.g., 2023)
-        title: "Payment Methods", // for reference in chart UI
-        ...methods,                // dynamic payment methods: Cash, Card, etc.
-        total,                     // total expense for that year
-      };
-    });
+   const chartData = Object.entries(groupedByYear).map(([year, methods]) => {
+  const total = Object.values(methods).reduce((sum, val) => sum + val, 0);
+
+  const Array = Object.entries(methods).map(([methodName, value]) => ({
+    name: methodName,
+    value,
+  }));
+
+  return {
+    name: year,                // x-axis label (e.g., 2023)
+    title: "Payment Methods", // for chart UI
+    total,                    // total expense for the year
+    Array,                    // 👈 wrap methods as an array of { name, value }
+  };
+});
+
 
     // ✅ Success response
     return NextResponse.json({

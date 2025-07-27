@@ -2,14 +2,14 @@
 
 import React, { useEffect, useState } from 'react';
 import { useDateContext } from '@/context/DateContext';
-import ExpenseBarChart from '@/components/charts/barcharts/barchart';
+import LineChart from '@/components/charts/linecharts/route';
 
 type ExpenseData = {
   date: string;
   total: number;
 };
 
-const BarChartsPage = () => {
+const LineChartsPage = () => {
   const { startDate, endDate } = useDateContext();
 
   const [dataDate, setDataDate] = useState<ExpenseData[]>([]);
@@ -47,7 +47,7 @@ const BarChartsPage = () => {
         setDataMonth(monthJson.data || []);
         setDataYear(yearJson.data || []);
       } catch (err) {
-        console.error('Failed to fetch expense chart data:', err);
+        console.error('Failed to fetch expense data:', err);
       } finally {
         setLoading(false);
       }
@@ -57,25 +57,37 @@ const BarChartsPage = () => {
   }, [startDate, endDate]);
 
   return (
-    <div style={{ padding: '2rem' }}>
-      <h1 className="text-3xl font-bold mb-6">Expense Charts</h1>
+    <div className="p-6 space-y-10">
+      <h1 className="text-3xl font-bold text-gray-800 mb-4">Expense Line Charts</h1>
 
-      <section className="mb-10">
-        <h2 className="text-lg font-semibold mb-2">Daily</h2>
-        {loading ? <p>Loading...</p> : <ExpenseBarChart data={dataDate} />}
-      </section>
-
-      <section className="mb-10">
-        <h2 className="text-lg font-semibold mb-2">Monthly</h2>
-        {loading ? <p>Loading...</p> : <ExpenseBarChart data={dataMonth} />}
+      <section>
+        <h2 className="text-lg font-semibold text-gray-700 mb-2">Daily</h2>
+        {loading ? (
+          <p className="text-gray-500">Loading daily chart...</p>
+        ) : (
+          <LineChart data={dataDate} />
+        )}
       </section>
 
       <section>
-        <h2 className="text-lg font-semibold mb-2">Yearly</h2>
-        {loading ? <p>Loading...</p> : <ExpenseBarChart data={dataYear} />}
+        <h2 className="text-lg font-semibold text-gray-700 mb-2">Monthly</h2>
+        {loading ? (
+          <p className="text-gray-500">Loading monthly chart...</p>
+        ) : (
+          <LineChart data={dataMonth} />
+        )}
+      </section>
+
+      <section>
+        <h2 className="text-lg font-semibold text-gray-700 mb-2">Yearly</h2>
+        {loading ? (
+          <p className="text-gray-500">Loading yearly chart...</p>
+        ) : (
+          <LineChart data={dataYear} />
+        )}
       </section>
     </div>
   );
 };
 
-export default BarChartsPage;
+export default LineChartsPage;

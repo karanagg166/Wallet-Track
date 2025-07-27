@@ -16,71 +16,47 @@ const LineChartsPage = () => {
   const [dataMonth, setDataMonth] = useState<IncomeData[]>([]);
   const [dataYear, setDataYear] = useState<IncomeData[]>([]);
 
-  const [loadingDate, setLoadingDate] = useState(true);
-  const [loadingMonth, setLoadingMonth] = useState(true);
-  const [loadingYear, setLoadingYear] = useState(true);
+  const [loading, setLoading] = useState(true);
 
-  // Daily
   useEffect(() => {
-    const fetchData = async () => {
-      setLoadingDate(true);
+    const fetchAllData = async () => {
+      setLoading(true);
       try {
-        const res = await fetch('/api/charts/incomes/normal/days', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ date1: startDate, date2: endDate }),
-        });
-        const json = await res.json();
-        setDataDate(json.data || []);
+        const [dayRes, monthRes, yearRes] = await Promise.all([
+          fetch('/api/charts/incomes/normal/days', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ date1: startDate, date2: endDate }),
+          }),
+          fetch('/api/charts/incomes/normal/months', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ date1: startDate, date2: endDate }),
+          }),
+          fetch('/api/charts/incomes/normal/years', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ date1: startDate, date2: endDate }),
+          }),
+        ]);
+
+        const [dayData, monthData, yearData] = await Promise.all([
+          dayRes.json(),
+          monthRes.json(),
+          yearRes.json(),
+        ]);
+
+        setDataDate(dayData.data || []);
+        setDataMonth(monthData.data || []);
+        setDataYear(yearData.data || []);
       } catch (err) {
-        console.error('Failed to fetch daily income data:', err);
+        console.error('Failed to fetch income data:', err);
       } finally {
-        setLoadingDate(false);
+        setLoading(false);
       }
     };
-    fetchData();
-  }, [startDate, endDate]);
 
-  // Monthly
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoadingMonth(true);
-      try {
-        const res = await fetch('/api/charts/incomes/normal/months', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ date1: startDate, date2: endDate }),
-        });
-        const json = await res.json();
-        setDataMonth(json.data || []);
-      } catch (err) {
-        console.error('Failed to fetch monthly income data:', err);
-      } finally {
-        setLoadingMonth(false);
-      }
-    };
-    fetchData();
-  }, [startDate, endDate]);
-
-  // Yearly
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoadingYear(true);
-      try {
-        const res = await fetch('/api/charts/incomes/normal/years', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ date1: startDate, date2: endDate }),
-        });
-        const json = await res.json();
-        setDataYear(json.data || []);
-      } catch (err) {
-        console.error('Failed to fetch yearly income data:', err);
-      } finally {
-        setLoadingYear(false);
-      }
-    };
-    fetchData();
+    fetchAllData();
   }, [startDate, endDate]);
 
   return (
@@ -89,7 +65,7 @@ const LineChartsPage = () => {
 
       <section>
         <h2 className="text-lg font-semibold text-gray-700 mb-2">Daily</h2>
-        {loadingDate ? (
+        {loading ? (
           <p className="text-gray-500">Loading daily chart...</p>
         ) : (
           <LineChart data={dataDate} />
@@ -98,7 +74,7 @@ const LineChartsPage = () => {
 
       <section>
         <h2 className="text-lg font-semibold text-gray-700 mb-2">Monthly</h2>
-        {loadingMonth ? (
+        {loading ? (
           <p className="text-gray-500">Loading monthly chart...</p>
         ) : (
           <LineChart data={dataMonth} />
@@ -107,7 +83,7 @@ const LineChartsPage = () => {
 
       <section>
         <h2 className="text-lg font-semibold text-gray-700 mb-2">Yearly</h2>
-        {loadingYear ? (
+        {loading ? (
           <p className="text-gray-500">Loading yearly chart...</p>
         ) : (
           <LineChart data={dataYear} />

@@ -14,7 +14,7 @@ type DonutChartData = {
   name: string;
   title: string;
   total: number;
-  sources: { name: string; value: number }[];
+  Array: { name: string; value: number }[];
 };
 
 type Props = {
@@ -23,11 +23,11 @@ type Props = {
 };
 
 export default function DonutChart({ data, totalLabel }: Props) {
-  if (!data || data.length === 0 || !data[0].sources) return <p>No data</p>;
+  if (!data || data.length === 0 || !data[0].Array) return <p>No data</p>;
 
-  const { sources, total } = data[0];
+  const { Array, total } = data[0];
 
-  const sanitizedSources = sources.map((item) => ({
+  const sanitizedArray = Array.map((item) => ({
     name: item.name,
     value: isNaN(item.value) ? 0 : item.value,
   }));
@@ -36,14 +36,14 @@ export default function DonutChart({ data, totalLabel }: Props) {
     <ResponsiveContainer width="100%" height={300}>
       <RePieChart>
         <Pie
-          data={sanitizedSources}
+          data={sanitizedArray}
           dataKey="value"
           nameKey="name"
           innerRadius={60}
           outerRadius={100}
           label
         >
-          {sanitizedSources.map((_, index) => (
+          {sanitizedArray.map((_, index) => (
             <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
           ))}
         </Pie>

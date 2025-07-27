@@ -6,14 +6,14 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 
 const chartOptions = [
-  { name: 'Bar Charts', href: '/dashboard/analysis/income/bar-charts' },
-  { name: 'Line Charts', href: '/dashboard/analysis/income/line-charts' },
-  { name: 'Area Charts', href: '/dashboard/analysis/income/area-charts' },
-  { name: 'Stacked Charts', href: '/dashboard/analysis/income/stacked-bar' },
-  { name: 'Histogram', href: '/dashboard/analysis/income/histogram' },
+  { name: 'Bar Charts', href: '/dashboard/analysis/expense/bar-charts' },
+  { name: 'Line Charts', href: '/dashboard/analysis/expense/line-charts' },
+  { name: 'Area Charts', href: '/dashboard/analysis/expense/area-charts' },
+  { name: 'Stacked-payment-method', href: '/dashboard/analysis/expense/stacked-bar-paymentmethods' },
+  { name: 'Stacked-category-wise', href: '/dashboard/analysis/expense/stacked-barcharts-category' },
 ];
 
-export default function IncomeLayout({ children }: { children: React.ReactNode }) {
+export default function ExpenseLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -23,7 +23,7 @@ export default function IncomeLayout({ children }: { children: React.ReactNode }
       <div className="min-h-screen flex flex-col">
         {/* Header with Date Inputs */}
         <div className="bg-white border-b p-4 flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
-          <h1 className="text-2xl font-bold text-gray-800">Income Analysis</h1>
+          <h1 className="text-2xl font-bold text-gray-800">Expense Analysis</h1>
           <div className="flex gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700">Start Date</label>

@@ -54,15 +54,22 @@ export async function POST(req: Request) {
     }
 
     // 📈 Format data for chart consumption
-    const chartData = Object.entries(groupedByMonth).map(([month, methods]) => {
-      const total = Object.values(methods).reduce((sum, val) => sum + val, 0);
-      return {
-        name: month,         // x-axis: month
-        title: "Payment Methods",
-        ...methods,          // dynamic keys: Cash, Card, etc.
-        total,               // optional: total expense that month
-      };
-    });
+   const chartData = Object.entries(groupedByMonth).map(([month, methods]) => {
+  const total = Object.values(methods).reduce((sum, val) => sum + val, 0);
+
+  const Array = Object.entries(methods).map(([methodName, value]) => ({
+    name: methodName,
+    value,
+  }));
+
+  return {
+    name: month,           // x-axis: month
+    title: "Payment Methods",
+    total,                 // total amount for the month
+    Array,                 // 👈 now wrapped inside 'Array'
+  };
+});
+
 
     // ✅ Success response
     return NextResponse.json({

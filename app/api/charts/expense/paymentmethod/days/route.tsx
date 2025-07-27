@@ -59,14 +59,21 @@ export async function POST(req: Request) {
 
     // 🧾 Format final output for charting libraries
     const chartData = Object.entries(groupedByDate).map(([date, methods]) => {
-      const total = Object.values(methods).reduce((sum, val) => sum + val, 0);
-      return {
-        name: date,          // x-axis (date)
-        title: "Payment Methods",
-        ...methods,          // dynamic bars by payment method
-        total,               // optional: total amount that day
-      };
-    });
+  const total = Object.values(methods).reduce((sum, val) => sum + val, 0);
+
+  // Wrap each method as { name, value } inside an array
+  const Array = Object.entries(methods).map(([methodName, value]) => ({
+    name: methodName,
+    value,
+  }));
+
+  return {
+    name: date,          // x-axis label
+    title: 'Payment Methods',
+    total,               // total per day
+    Array,               // 👈 wrapped in `Array` as requested
+  };
+});
 
     // ✅ Respond with success
     return NextResponse.json(

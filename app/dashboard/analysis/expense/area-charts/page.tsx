@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useDateContext } from '@/context/DateContext';
 import AreaChart from '@/components/charts/areacharts/route';
 
-type IncomeData = {
+type ExpenseData = {
   date: string;
   total: number;
 };
@@ -12,9 +12,10 @@ type IncomeData = {
 const AreaChartsPage = () => {
   const { startDate, endDate } = useDateContext();
 
-  const [dataDate, setDataDate] = useState<IncomeData[]>([]);
-  const [dataMonth, setDataMonth] = useState<IncomeData[]>([]);
-  const [dataYear, setDataYear] = useState<IncomeData[]>([]);
+  const [dataDate, setDataDate] = useState<ExpenseData[]>([]);
+  const [dataMonth, setDataMonth] = useState<ExpenseData[]>([]);
+  const [dataYear, setDataYear] = useState<ExpenseData[]>([]);
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -22,17 +23,17 @@ const AreaChartsPage = () => {
       setLoading(true);
       try {
         const [dayRes, monthRes, yearRes] = await Promise.all([
-          fetch('/api/charts/incomes/normal/days', {
+          fetch('/api/charts/expense/normal/days', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ date1: startDate, date2: endDate }),
           }),
-          fetch('/api/charts/incomes/normal/months', {
+          fetch('/api/charts/expense/normal/months', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ date1: startDate, date2: endDate }),
           }),
-          fetch('/api/charts/incomes/normal/years', {
+          fetch('/api/charts/expense/normal/years', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ date1: startDate, date2: endDate }),
@@ -46,8 +47,8 @@ const AreaChartsPage = () => {
         setDataDate(dayJson.data || []);
         setDataMonth(monthJson.data || []);
         setDataYear(yearJson.data || []);
-      } catch (error) {
-        console.error('Failed to fetch area chart data:', error);
+      } catch (err) {
+        console.error('Failed to fetch area chart data:', err);
       } finally {
         setLoading(false);
       }
@@ -58,16 +59,22 @@ const AreaChartsPage = () => {
 
   return (
     <div style={{ padding: '2rem' }}>
-      <h1>Income Area Charts</h1>
+      <h1 className="text-3xl font-bold mb-6">Expense Area Charts</h1>
 
-      <h2>Daily</h2>
-      {loading ? <p>Loading...</p> : <AreaChart data={dataDate} />}
+      <section className="mb-8">
+        <h2 className="text-lg font-semibold mb-2">Daily</h2>
+        {loading ? <p>Loading...</p> : <AreaChart data={dataDate} />}
+      </section>
 
-      <h2>Monthly</h2>
-      {loading ? <p>Loading...</p> : <AreaChart data={dataMonth} />}
+      <section className="mb-8">
+        <h2 className="text-lg font-semibold mb-2">Monthly</h2>
+        {loading ? <p>Loading...</p> : <AreaChart data={dataMonth} />}
+      </section>
 
-      <h2>Yearly</h2>
-      {loading ? <p>Loading...</p> : <AreaChart data={dataYear} />}
+      <section>
+        <h2 className="text-lg font-semibold mb-2">Yearly</h2>
+        {loading ? <p>Loading...</p> : <AreaChart data={dataYear} />}
+      </section>
     </div>
   );
 };
