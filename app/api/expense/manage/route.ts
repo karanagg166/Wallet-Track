@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { NextResponse } from 'next/server';
 import { getUserFromCookie } from '@/lib/cookies/CookieUtils';
+import { createExpenseNotification } from '@/lib/notifications/createNotification';
 
 const prisma = new PrismaClient();
 
@@ -24,19 +25,12 @@ export async function POST(req: Request) {
     // Combine date and time into a single Date object
     const expenseAt = new Date(`${date}T${time}`);
 
+    // Get category name for notification
+    const categoryData = await prisma.category.findUnique({
+      where: { id: category }
+    });
+
     // Create new expense record
-
-    const dataT = {
-        amount,
-        title,
-        categoryId: category,
-        paymentmethod,
-        expenseAt,
-        userId: user.id,
-      };
-
-    //console.log(dataT);
-
     const expense = await prisma.expense.create({
       data: {
         amount,
@@ -47,6 +41,19 @@ export async function POST(req: Request) {
         userId: user.id,
       },
     });
+
+    // Create notification for the new expense
+    try {
+      await createExpenseNotification(
+        user.id,
+        amount,
+        title,
+        categoryData?.name || "Unknown Category"
+      );
+    } catch (notificationError) {
+      console.error("Error creating notification:", notificationError);
+      // Don't fail the expense creation if notification fails
+    }
 
     return NextResponse.json({ message: "Expense created", data: expense }, { status: 200 });
   } catch (error) {

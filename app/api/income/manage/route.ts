@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { NextResponse } from 'next/server';
 import { getUserFromCookie } from '@/lib/cookies/CookieUtils';
+import { createIncomeNotification } from '@/lib/notifications/createNotification';
 
 const prisma = new PrismaClient();
 
@@ -30,6 +31,19 @@ export async function POST(req: Request) {
         incomesource,
       },
     });
+
+    // Create notification for the new income
+    try {
+      await createIncomeNotification(
+        user.id,
+        amount,
+        title,
+        incomesource
+      );
+    } catch (notificationError) {
+      console.error("Error creating notification:", notificationError);
+      // Don't fail the income creation if notification fails
+    }
 
     return NextResponse.json(
       { message: "Income created successfully", data: newIncome },

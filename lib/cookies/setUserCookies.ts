@@ -15,7 +15,7 @@ export function setUserCookies(
 const options: Partial<ResponseCookie> = {
   httpOnly: true,
   path: '/',
-  maxAge: 60 * 60 * 3,
+  maxAge: 60 * 60 * 30,
   secure: process.env.NODE_ENV === 'production',
   sameSite: 'lax',
 };
