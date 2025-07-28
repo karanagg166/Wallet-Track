@@ -61,6 +61,29 @@ export const useNotifications = () => {
     }
   };
 
+  const deleteNotification = async (notificationId: string) => {
+    try {
+      const response = await fetch("/api/notifications/delete", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ notificationId }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete notification");
+      }
+
+      // Update local state
+      setNotifications(prev =>
+        prev.filter(notification => notification.id !== notificationId)
+      );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+    }
+  };
+
   const unreadCount = notifications.filter(n => !n.isRead).length;
 
   useEffect(() => {
@@ -74,5 +97,6 @@ export const useNotifications = () => {
     unreadCount,
     fetchNotifications,
     markAsRead,
+    deleteNotification,
   };
 }; 

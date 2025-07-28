@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Bell } from "lucide-react";
+import { Bell, Trash2, Eye } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNotifications } from "@/hooks/notifications/useNotifications";
 import { useRouter } from "next/navigation";
@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 const NotificationButton = () => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const { notifications, unreadCount, markAsRead, loading } = useNotifications();
+  const { notifications, unreadCount, markAsRead, loading, deleteNotification } = useNotifications();
   const router = useRouter();
 
   useEffect(() => {
