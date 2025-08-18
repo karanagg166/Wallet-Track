@@ -49,14 +49,14 @@ const contributors = [
 ];
 
 const iconMap = {
-  linkedin: <FaLinkedin className="hover:text-[#0077b5] transition-all duration-300" />,
-  instagram: <FaInstagram className="hover:text-[#e1306c] transition-all duration-300" />,
-  leetcode: <SiLeetcode className="hover:text-yellow-400 transition-all duration-300" />,
-  codeforces: <SiCodeforces className="hover:text-[#1f8acb] transition-all duration-300" />,
-  codechef: <SiCodechef className="hover:text-[#5b4638] transition-all duration-300" />,
-  geeksforgeeks: <SiGeeksforgeeks className="hover:text-green-500 transition-all duration-300" />,
-  github: <FaGithub className="hover:text-gray-300 transition-all duration-300" />,
-  portfolio: <FaGlobe className="hover:text-teal-300 transition-all duration-300" />,
+  linkedin: <FaLinkedin className="hover:text-[#0077b5] hover:drop-shadow-lg transition-all duration-300" />,
+  instagram: <FaInstagram className="hover:text-[#e1306c] hover:drop-shadow-lg transition-all duration-300" />,
+  leetcode: <SiLeetcode className="hover:text-yellow-400 hover:drop-shadow-lg transition-all duration-300" />,
+  codeforces: <SiCodeforces className="hover:text-[#1f8acb] hover:drop-shadow-lg transition-all duration-300" />,
+  codechef: <SiCodechef className="hover:text-[#5b4638] hover:drop-shadow-lg transition-all duration-300" />,
+  geeksforgeeks: <SiGeeksforgeeks className="hover:text-green-500 hover:drop-shadow-lg transition-all duration-300" />,
+  github: <FaGithub className="hover:text-gray-300 hover:drop-shadow-lg transition-all duration-300" />,
+  portfolio: <FaGlobe className="hover:text-teal-300 hover:drop-shadow-lg transition-all duration-300" />,
 };
 
 export default function AboutPage() {
@@ -74,8 +74,8 @@ export default function AboutPage() {
             className="bg-[#1e293b]/90 rounded-3xl p-6 shadow-xl backdrop-blur-md border border-blue-400/20 relative overflow-hidden"
           >
             <motion.div
-              className="w-32 h-32 mx-auto mb-4 shadow-lg border-4 border-blue-400/40 rounded-full overflow-hidden transition-transform duration-500 hover:rotate-[8deg] hover:scale-110"
-              whileHover={{ rotateY: 5, rotateX: 5, scale: 1.04 }}
+              className="w-32 h-32 mx-auto mb-4 shadow-lg border-4 border-blue-400/40 rounded-full overflow-hidden"
+              whileHover={{ rotateY: 10, rotateX: 10, scale: 1.1 }}
               transition={{ type: 'spring', stiffness: 200 }}
             >
               <img
@@ -84,25 +84,42 @@ export default function AboutPage() {
                 className="w-full h-full object-cover"
               />
             </motion.div>
+
             <h2 className="text-2xl font-bold text-center mb-2 bg-gradient-to-r from-blue-300 to-cyan-400 text-transparent bg-clip-text">
               {contributor.name}
             </h2>
-            <p className="text-center text-sm text-[#94a3b8] italic mb-2">{contributor.location} — {contributor.university}</p>
-            <p className="text-[#e2e8f0] mb-4 whitespace-pre-line text-sm">{contributor.description}</p>
+            <p className="text-center text-sm text-[#94a3b8] italic mb-2">
+              {contributor.location} — {contributor.university}
+            </p>
+            <p className="text-[#e2e8f0] mb-4 whitespace-pre-line text-sm">
+              {contributor.description}
+            </p>
             <ul className="mb-4 text-sm list-disc list-inside text-[#7dd3fc]">
               {contributor.hobbies.map((hobby, i) => (
                 <li key={i}>{hobby}</li>
               ))}
             </ul>
-            <blockquote className="text-center italic text-[#38bdf8] border-l-4 border-blue-400 pl-4">"{contributor.quote}"</blockquote>
+            <blockquote className="text-center italic text-[#38bdf8] border-l-4 border-blue-400 pl-4">
+              "{contributor.quote}"
+            </blockquote>
 
-            <div className="flex justify-center mt-6 gap-4 text-xl">
+            <motion.div
+              className="flex justify-center mt-6 gap-4 text-xl"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
               {Object.entries(contributor.socials).map(([platform, link], i) => (
-                <Link key={i} href={link} target="_blank" className="transition-transform hover:scale-125">
+                <Link
+                  key={i}
+                  href={link}
+                  target="_blank"
+                  className="transition-transform hover:scale-125"
+                >
                   {iconMap[platform]}
                 </Link>
               ))}
-            </div>
+            </motion.div>
           </motion.div>
         ))}
       </div>
