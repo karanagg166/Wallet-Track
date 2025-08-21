@@ -13,7 +13,7 @@ type IncomeData = {
   name: string;
   title: string;
   total: number;
-  sources: IncomeItem[];
+  Array: IncomeItem[];
 };
 
 const StackedBarPage: React.FC = () => {

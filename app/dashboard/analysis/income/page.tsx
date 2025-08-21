@@ -12,7 +12,7 @@ type IncomeData = {
   name: string;
   title: string;
   total: number;
-  array: IncomeItem[];
+  Array: IncomeItem[];
 };
 
 const IncomeHome = () => {
