@@ -325,12 +325,7 @@ export default function Home() {
         </motion.div>
       </motion.section>
 
-      {/* Footer */}
-      <footer className="flex justify-center items-center py-4 bg-transparent border-t border-[#222c37] mt-8">
-        <p className="text-gray-500 text-sm">
-          © {new Date().getFullYear()} WalletTrack. All rights reserved.
-        </p>
-      </footer>
+    
     </main>
   );
 }
