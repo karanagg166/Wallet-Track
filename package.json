@@ -1,5 +1,5 @@
 {
-  "name": "stock-pilot",
+  "name": "wallet-track",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -8,23 +8,24 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
-    "seed": "tsx prisma/seed.ts"
+    "seed": "tsx prisma/seed.ts",
+    "postinstall": "prisma generate"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/karanagg166/stockpilot.git"
+    "url": "git+https://github.com/karanagg166/Wallet-Track.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "bugs": {
-    "url": "https://github.com/karanagg166/stockpilot/issues"
+    "url": "https://github.com/karanagg166/Wallet-Track/issues"
   },
-  "homepage": "https://github.com/karanagg166/stockpilot#readme",
+  "homepage": "https://github.com/karanagg166/Wallet-Track#readme",
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
