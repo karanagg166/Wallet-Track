@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { ThemeProvider } from 'next-themes'
 import './globals.css'
+import Footer from '@/components/Footer'
 
 export const metadata: Metadata = {
   title: 'WalletTrack',
@@ -19,6 +20,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         >
           <div className="min-h-screen w-full flex flex-col">
             {children}
+            <Footer />
           </div>
         </ThemeProvider>
       </body>

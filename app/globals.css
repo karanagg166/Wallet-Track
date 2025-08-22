@@ -158,9 +158,7 @@
     @apply bg-background text-foreground;
     font-family: 'Poppins', 'Libertinus Math', serif;
     margin: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    padding: 0;
   }
 
   a {
